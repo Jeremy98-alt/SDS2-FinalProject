@@ -1,0 +1,515 @@
+---
+title: "Heart Attack, the Final Project"
+author: "Sapienza Jeremy 1960498"
+date: "6/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+require(tidyverse)
+require(magrittr)
+require(R2jags)
+require(bayesplot)
+require(TeachingDemos)
+require(factoextra)
+require(highcharter)
+require(dplyr)
+
+load_cat <- function(frame) {
+    
+  sorted_df <- frame %>%
+              drop_na() %>%
+              dplyr::summarise(Count = n()) %>%
+              dplyr::arrange(desc(Count)) %>%
+              dplyr::mutate(percentage = paste0(round(Count / sum(Count) * 100, 1), "%"))
+    
+    return(sorted_df)
+}
+
+hist.and.summary <- function(variable, main.title){
+  print(summary(dat[[variable]])) 
+  hchart(dat[[variable]], type = "column", name = variable, color = randomcoloR::randomColor()) %>%
+    hc_title(text = main.title) %>%
+    hc_xAxis(title = variable) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=2, beta=-10, 
+                              depth=100, viewDistance=25)) %>% 
+    hc_plotOptions(column=list(depth= 100))
+}
+
+dense.chart <- function(name, title){ # Showing the density considering the two cases of having an heart attack or not
+  
+  frame <- dat[ , (names(dat) %in% c(name, 'output'))] # select the interested rows
+
+  # sub select the two categories
+  normal <- frame %>% filter(output == 0)
+  heart_attack <- frame %>% filter(output == 1)
+
+  hchart( density(unlist(normal[, name])), type = "area", color = randomcoloR::randomColor(), name = "Normal") %>%
+      hc_add_series( density(unlist(heart_attack[, name])), type = "area", color = randomcoloR::randomColor(), name = "Heart Attack") %>%
+        hc_title(text= title) %>%
+          hc_xAxis(title = name)
+}
+```
+
+$$~$$
+
+# Introduction
+
+$$~$$
+
+## The Dataset
+
+$$~$$
+
+```{r}
+dat <- read_csv("heart.csv")
+dat <- unique(dat) # remove any duplicate presents
+```
+
+$$~$$
+
+# The Goal
+
+$$~$$
+
+$$~$$
+
+# The Data Visualization
+
+$$~$$
+
+the data....
+
+```{r echo=FALSE, fig.align="center"}
+# for visualization
+res.pca <- prcomp(dat, scale = FALSE) # compute PCA
+
+# patients  with a similar profile are grouped together
+fviz_pca_ind(res.pca,
+             col.ind = "cos2", # Color by the quality of representation
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE,     # Avoid text overlapping
+             label=FALSE
+)
+
+fviz_eig(res.pca) # Show the percentage of variances explained by each principal component
+```
+
+$$~$$
+
+## The Categorical Data
+
+$$~$$
+
+```{r echo=FALSE}
+get_cp_str <- function(bool_var){
+  char_list <- c(1, length(bool_var))
+  for (i in 1:length(bool_var)) {
+    var <- bool_var[i]
+    new_char <- 'unknown'  
+    
+    if(var == 0){
+        new_char <- 'typical angina'
+    }
+      
+    if(var == 1){
+        new_char <- 'atypical angina'
+    }
+      
+    if(var == 2){
+        new_char <- 'non-anginal pain'
+    }
+      
+    if(var == 3){
+        new_char <- 'asymptomatic'
+    }
+      
+     char_list[i] <-  new_char
+   }
+    
+    return(char_list)
+ }
+
+cp_dat <- dat %>% 
+    dplyr::select(cp) %>%
+    dplyr::group_by(cp) %>%
+    dplyr::summarise(Count = n()) %>%
+    dplyr::arrange(desc(Count)) %>%
+    dplyr::mutate(
+        cp_str = get_cp_str(cp),
+        percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
+    )
+
+cp_dat %>%
+  hchart(type = "pie", hcaes(x = paste(cp_str, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(title = 'Chest Pain', categories = paste(cp_dat$cp_str, ' (', cp_dat$percentage, ')' )) %>%
+    hc_title(text = 'Chest Pain') %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45, beta=0)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+```
+
+```{r echo=FALSE}
+get_string <- function(bool_var){
+  char_list <- c(1, length(bool_var))
+  for (i in 1:length(bool_var)) {
+    var <- bool_var[i]
+    new_char <- 'unknown'  
+    
+    if(var == 1){
+        new_char <- 'prediabetes (fbs > 120 mg/d)'
+    }
+    else{
+        new_char <- 'normal'
+     }
+      
+     char_list[i] <-  new_char
+   }
+    
+    return(char_list)
+ }
+
+fbs_dat <- dat %>% 
+    dplyr::select(fbs) %>%
+    dplyr::group_by(fbs) %>%
+    dplyr::summarise(Count = n()) %>%
+    dplyr::arrange(desc(Count)) %>%
+    dplyr::mutate(
+        fbs_str = get_string(fbs),
+        percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
+    )
+
+fbs_dat %>%
+  hchart(type = "pie", hcaes(x = paste(fbs_str, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(title = 'fasting blood sugar', categories = paste(get_string(fbs_dat$fbs_str), ' (', fbs_dat$percentage, ')' )) %>%
+    hc_title(text = 'Fasting Blood Sugar') %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+```
+
+```{r echo=FALSE}
+get_restecg_str <- function(bool_var){
+  char_list <- c(1, length(bool_var))
+  for (i in 1:length(bool_var)) {
+    var <- bool_var[i]
+    new_char <- 'unknown'  
+    
+    if(var == 0){
+        new_char <- 'Normal'
+    }
+    if(var == 1){
+        new_char <- 'lvl 1, having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV)'
+    }
+    if(var == 2){
+        new_char <- "lvl 2, showing probable or definite left ventricular hypertrophy by Estes' criteria"
+     }
+      
+     char_list[i] <-  new_char
+   }
+    
+    return(char_list)
+ }
+
+restecg_dat <- dat %>% 
+    dplyr::select(restecg) %>%
+    dplyr::group_by(restecg) %>%
+    dplyr::summarise(Count = n()) %>%
+    dplyr::arrange(desc(Count)) %>%
+    dplyr::mutate(
+        restecg_str = get_restecg_str(restecg),
+        percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
+    )
+
+restecg_dat %>%
+  hchart(type = "pie", hcaes(x = paste(restecg_str, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(title = 'restecg', categories = paste(restecg_dat$restecg_str, ' (', restecg_dat$percentage, ')' )) %>%
+    hc_title(text = 'Resting Electrocardiographic Results') %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+```
+
+```{r echo=FALSE}
+slp_dat <- load_cat(
+              dat %>%
+               dplyr::select(slp) %>%
+               dplyr::group_by(slp)
+             )
+
+slp_dat %>%
+  hchart(type = "pie", hcaes(x = paste(slp, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(title = 'Slope', categories = paste(slp_dat$slp, ' (', slp_dat$percentage, ')' )) %>%
+    hc_title(text = 'Slope') %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+    
+```
+
+```{r echo=FALSE}
+caa_dat <- load_cat(
+              dat %>%
+               dplyr::select(caa) %>%
+               dplyr::group_by(caa)
+             )
+
+caa_dat %>%
+  hchart(type = "pie", hcaes(x = paste(caa, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(title = 'caa', categories = paste(caa_dat$caa, ' (', caa_dat$percentage, ')' )) %>%
+    hc_title(text = 'Number of Major Vessels (0-4)') %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+
+```
+
+```{r echo=FALSE}
+
+thall_dat <- load_cat(
+              dat %>%
+               dplyr::select(thall) %>%
+               dplyr::group_by(thall)
+             )
+
+thall_dat %>%
+  hchart(type = "pie", hcaes(x = paste(thall, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(title = 'Thall', categories = paste(thall_dat$thall, ' (', thall_dat$percentage, ')' )) %>%
+    hc_title(text = 'Thall') %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+
+```
+
+```{r echo=FALSE}
+make_string <- function(bool_var){
+  char_list <- c(1, length(bool_var))
+  for (i in 1:length(bool_var)) {
+    var <- bool_var[i]
+    new_char <- 'unknown'  
+    
+    if(var == 1){
+        new_char <- 'Yes'
+    }
+    else{
+        new_char <- 'No'
+     }
+      
+     char_list[i] <-  new_char
+   }
+    
+    return(char_list)
+ }
+
+exng_dat <- dat %>% 
+    dplyr::select(exng) %>%
+    dplyr::group_by(exng) %>%
+    dplyr::summarise(Count = n()) %>%
+    dplyr::arrange(desc(Count)) %>%
+    dplyr::mutate(
+        exng_txt = make_string(exng),
+        percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
+    )
+exng_dat %>%
+  hchart(type = "pie", hcaes(x = paste(exng_txt, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(title = 'Exercise Induced Angina', categories = paste(exng_dat$exng_txt, ' (', exng_dat$percentage, ')' )) %>%
+    hc_title(text = 'Exercise Induced Angina (1 = yes; 0 = no)') %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+
+```
+
+```{r echo=FALSE}
+
+make_string = function(bool_var){
+  char_list = c(1, length(bool_var))
+  for (i in 1:length(bool_var)) {
+    var = bool_var[i]
+    new_char = 'unknown'  
+    
+    if(var == 1){
+        new_char = 'Male'
+    }
+    else{
+        new_char = 'Female'
+     }
+      
+     char_list[i] =  new_char
+   }
+    
+    return(char_list)
+ }
+
+gender_dat <- dat %>% 
+    dplyr::select(sex) %>%
+    dplyr::group_by(sex) %>%
+    dplyr::summarise(Count = n()) %>%
+    dplyr::arrange(desc(Count)) %>%
+    dplyr::mutate(
+        gender = make_string(sex),
+        percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
+    )
+
+
+gender_dat %>%
+  hchart(type = "pie", hcaes(x = paste(gender, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(categories = paste(gender_dat$gender, ' (', gender_dat$percentage, ')' )) %>%
+    hc_title(text = "Person's Gender") %>%
+    hc_add_theme(hc_theme_google()) %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))
+              
+``` 
+
+```{r echo=FALSE}
+make_string_heart <- function(bool_var){
+  char_list <- c(1, length(bool_var))
+  for (i in 1:length(bool_var)) {
+    var <- bool_var[i]
+    new_char <- 'unknown'  
+
+    if(var == 0){
+        new_char <- '0 - Normal'
+     }
+      
+    if(var == 1){
+        new_char <- '1 - Heart Attack'
+    }
+      
+     char_list[i] <-  new_char
+   }
+    
+    return(char_list)
+ }
+
+output_dat <- dat %>% 
+    dplyr::select(output) %>%
+    dplyr::group_by(output) %>%
+    dplyr::summarise(Count = n()) %>%
+    dplyr::arrange(desc(Count)) %>%
+    dplyr::mutate(
+        heart_attack = make_string_heart(output),
+        percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
+    )
+
+
+output_dat %>%
+  hchart(type = "pie", hcaes(x = paste(heart_attack, ' \t(', percentage, ')' ), y = Count)) %>%
+    hc_xAxis(categories = paste(output_dat$heart_attack, ' (', gender_dat$percentage, ')' )) %>%
+    hc_title(text = 'Heart Attack') %>%
+    hc_add_theme(hc_theme_google())  %>%
+    hc_chart(options3d=list(enabled=TRUE, alpha=45)) %>% 
+    hc_plotOptions(pie=list(innerSize= 100, 
+                            depth= 45))         
+
+```
+
+$$~$$
+
+## The Quantitative Data
+
+$$~$$
+
+We illustrate the main features of the quantitative data, after have seen the categorical data in the previous section:
+
+$$~$$
+
+```{r, fig.width = 8, fig.height = 6}
+hist.and.summary('age', 'Persons Age')
+hist.and.summary('chol', 'Cholestoral')
+hist.and.summary('thalachh', 'Maximum Heart Rate Achieved')
+hist.and.summary('trtbps', 'Resting Blood Pressure')
+hist.and.summary('oldpeak', 'Previous Peak')
+```
+
+$$~$$
+
+After this, we consider also to see the densities considering the case of having the heart attack and not:
+
+$$~$$
+
+```{r}
+dense.chart('age', 'Persons Age')
+dense.chart('chol', 'Cholestoral')
+dense.chart('thalachh', 'Maximum Heart Rate Achieved')
+dense.chart('trtbps', 'Resting Blood Pressure')
+dense.chart('oldpeak', 'Previous Peak')
+```
+
+
+## The Correlations
+
+$$~$$
+
+```{r echo=FALSE}
+hchart(cor(dat[, c("sex", "cp", "fbs", "restecg", "exng", "slp", "caa", "thall")]), color = randomcoloR::randomColor()) %>%
+  hc_title(text = "Correlations between qualitative variables") # considering only the qualitative data
+
+hchart(cor(dat[, c("age", "chol", "thalachh", "trtbps", "oldpeak")]), color = randomcoloR::randomColor()) %>%
+  hc_title(text = "Correlations between quantitative variables") # considering only the quantitative data
+
+hchart(cor(dat[, c(1:13)]), color = randomcoloR::randomColor()) %>%
+  hc_title(text = "Correlations between all independent variables") # considering only the whole data
+```
+
+$$~$$
+
+# The First Model
+
+$$~$$
+
+### The Cumulative Means
+
+$$~$$
+
+### The Approximation Errors
+
+$$~$$
+
+### The Predictions
+
+$$~$$
+
+### The Correlations
+
+$$~$$
+
+# The Second Model
+
+$$~$$
+
+### The Cumulative Means
+
+$$~$$
+
+### The Approximation Errors
+
+$$~$$
+
+### The Predictions
+
+$$~$$
+
+### The Correlations
+
+$$~$$
+
+# The comparison between these two models
+
+$$~$$
+
+# The Conclusions
+
+$$~$$
