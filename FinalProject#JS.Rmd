@@ -8,6 +8,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
 
 require(tidyverse)
 require(magrittr)
@@ -126,7 +127,7 @@ ol ul {
     + 1 as flat
     + 2 as down sloping
 12. ***caa*** -> it refers to the number of major vessels that goes from 0 to 3
-13. ***thall*** -> it refers to the maximum rate achieved: 
+13. ***thall*** -> it refers to the maximum heart rate achieved: 
     + 0 as no-data 
     + 1 as normal
     + 2 as fixed defect
@@ -135,7 +136,7 @@ ol ul {
 
 $$~$$
 
-The main features detected are: 
+The main features detected are for each feature: 
 
 $$~$$
 
@@ -523,7 +524,7 @@ hist.and.summary('oldpeak', 'Previous Peak')
 
 $$~$$
 
-After this, we consider also to see the densities considering the case of having the heart attack and not:
+After this, we consider also the densities considering the case of having the heart attack and not:
 
 $$~$$
 
@@ -537,6 +538,10 @@ dense.chart('oldpeak', 'Previous Peak')
 
 
 ## The Correlations
+
+$$~$$
+
+Here, we want to highlight the correlations between the features treated in qualitative, quantitative and without any distinction.
 
 $$~$$
 
@@ -555,7 +560,71 @@ hchart(cor(dat[, c(1:13)]), color = randomcoloR::randomColor()) %>%
 
 $$~$$
 
+The main goal is to leverage the main fully Bayesian analysis on our data, based on understanding if a person has a heart attack or not. So, the response variable $Y_i$ (that is the "output" feature in our dataset) is the heart attack $\in \{0,1\}$ and the predictor variables ($x_i \in \mathbb{R}^{+}$) have been chosen using the glm() function, used to fit generalized linear models, specified by giving a symbolic description of the linear predictor and a description of the error distribution, as we can see below:
+
+```{r echo=FALSE}
+# Preparing data for JAGS
+N <- nrow(dat) # number of obs
+
+# Dependent Variable
+y <- as.vector(dat$output) # Target variable, risks heart attack?
+
+# Independent Variables
+x1 <- as.vector(dat$age) # Age
+x2 <- as.vector(dat$sex) # Sex
+x3 <- as.vector(dat$cp) # Chest Pain Type: 1) Typical Angina 2) Atypical Angina 3) Non-Anginal Pain 4) Asymptomatic
+x4 <- as.vector(dat$trtbps) # resting blood pressure (in mm Hg)
+x5 <- as.vector(dat$chol) # cholestoral in mg/dl fetched via BMI sensor
+x6 <- as.vector(dat$fbs) # (fasting blood sugar > 120 mg/dl) (1 = true; 0 = false)
+x7 <- as.vector(dat$restecg) # resting electrocardiographic results 0) Normal 1) having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV) 2) showing probable or definite left ventricular hypertrophy by Estes' criteria 
+x8 <- as.vector(dat$thalachh) # maximum heart rate achieved
+x9 <- as.vector(dat$exng) # exercise induced angina (1 = yes; 0 = no)
+x10 <- as.vector(dat$oldpeak) # Previous peak
+x11 <- as.vector(dat$slp) # Slope
+x12 <- as.vector(dat$caa) # number of major vessels (0-3)
+x13 <- as.vector(dat$thall) # Thal rate
+
+summary(glm(y ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11+x12+x13, family = binomial(),data=dat))
+```
+
+$$~$$
+
+As we can see above, the glm rejects the hypothesis to consider the variables:
+
+- ***Age***
+- ***Cholestoral***
+- ***fasting blood sugar***
+- ***resting electrocardiographic results***
+
+... and also the intercept isn't a good choice to admit in our model.
+
+then, in summary we have N = 302 observations. Then we decided to consider to models to see the difference on which model choice at the end of our analysis.
+
+$$~$$
+
 # The First Model
+
+$$~$$
+We decide to consider the following logistic regression model with the logit link function: 
+
+$$
+Y_i \sim Bern(p_i) \\
+logit(p_i) = \beta_{2} \cdot x_{2_i} + \beta_{3} \cdot x_{3_i} + \beta_{4} \cdot x_{4_i} +\beta_{8} \cdot x_{8_i} + \beta_{9} \cdot x_{9_i} + \beta_{10} \cdot x_{10_i} + \beta_{11} \cdot x_{11_i} + \beta_{12} \cdot x_{12_i} + \beta_{13} \cdot x_{13_i}
+$$
+The prior beta parameters are chosen approximatly considering the estimated averages saw in the previous subsection regarding the outcomes of glm(). So, the beta prior parameters are distributed following a normal distribution as follows:
+
+$$
+\beta_2 \sim N(\mu_2 = -1, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_3 \sim N(\mu_3 = 0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_4 \sim N(\mu_4 = 0, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_8 \sim N(\mu_8 = 0, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_9 \sim N(\mu_9 = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_{10} \sim N(\mu_{10} = 0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_{11} \sim N(\mu_{11} = 0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_{12} \sim N(\mu_{12} = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_{13} \sim N(\mu_{13} = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+$$
+The main reason is that we prefer chosing the binary classification as in this case the logistic regression to model our outcomes based only on 0 or 1.
 
 $$~$$
 
