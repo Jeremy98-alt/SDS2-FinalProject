@@ -79,7 +79,7 @@ $$~$$
 
 $$~$$
 
-Kaggle, is the main platform where I found this interesting dataset where applying our main bayesian inference for the main scope of this project.
+Kaggle, is the main platform where I found this interesting dataset where applying our main bayesian inference as the main scope of this project.
 
 This dataset is composed by these features:
 
@@ -136,7 +136,7 @@ ol ul {
 
 $$~$$
 
-The main features detected are for each feature: 
+The main features detected are: 
 
 $$~$$
 
@@ -187,7 +187,7 @@ $$~$$
 
 $$~$$
 
-Here, we want to analyze the percentages of the categorical data:
+Here, we want to analyze the percentages of each categorical data:
 
 $$~$$
 
@@ -510,7 +510,7 @@ $$~$$
 
 $$~$$
 
-We illustrate the main features of the quantitative data, after have seen the categorical data in the previous section:
+Here, we illustrate the main features of the quantitative data, after have seen the categorical data in the previous section:
 
 $$~$$
 
@@ -560,7 +560,11 @@ hchart(cor(dat[, c(1:13)]), color = randomcoloR::randomColor()) %>%
 
 $$~$$
 
-The main goal is to leverage the main fully Bayesian analysis on our data, based on understanding if a person has a heart attack or not. So, the response variable $Y_i$ (that is the "output" feature in our dataset) is the heart attack $\in \{0,1\}$ and the predictor variables ($x_i \in \mathbb{R}^{+}$) have been chosen using the glm() function, used to fit generalized linear models, specified by giving a symbolic description of the linear predictor and a description of the error distribution, as we can see below:
+The main goal is to leverage the main fully Bayesian analysis, based on understanding if a person has a heart attack or not. 
+
+So, the response variable $Y_i$ (that is the "output" feature in our dataset) is the heart attack $\in \{0,1\}$ and the predictor variables ($x_i \in \mathbb{R}^{+}$) have been chosen using the glm() function, used to fit generalized linear models, as we can see below:
+
+$$~$$
 
 ```{r echo=FALSE}
 # Preparing data for JAGS
@@ -591,21 +595,41 @@ $$~$$
 
 As we can see above, the glm rejects the hypothesis to consider the variables:
 
-- ***Age***
-- ***Cholestoral***
-- ***fasting blood sugar***
-- ***resting electrocardiographic results***
+- ***Age ~ $x_1$***
+- ***Cholestoral ~ $x_5$***
+- ***fasting blood sugar ~ $x_6$***
+- ***resting electrocardiographic results ~ $x_7$***
 
-... and also the intercept isn't a good choice to admit in our model.
+... and also the ***intercept*** isn't a good choice to admit it in our model.
 
-then, in summary we have N = 302 observations. Then we decided to consider to models to see the difference on which model choice at the end of our analysis.
+then, in summary we have N = 302 observations. Then we decided to consider two models and see the difference on which model at the end is the best model of our analysis.
+
+$$~$$
+
+# Preliminary brief definitions
 
 $$~$$
 
-# The First Model
+- ***Likelihood $\pi(y_{obs}|\theta)$:*** measures the goodness of fit of a statistical model to ***a sample of data for given values of the unknown parameters***. It is formed from the joint probability distribution of the sample, but viewed and used as a function of the parameters only, thus treating the random variables as fixed at the observed values.
+
+- ***Logistic regression model:*** Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables.
+
+- ***logit link function:*** it uses the Cumulative Distribution Function (CDF) of the logistic distribution. A benefit to using Logit is that the coefficients can be interpreted in the terms of odds ratios.
+
+- ***cloglog function:*** Is unlike Logit and Probit asymmetric. It is best used when the probability of an event is very small or very large.  The complementary log-log approaches 0 infinitely slower than any other link function. Cloglog model is closely related to continuous-time models for the occurrence of events, so it has an important application in the area of survival analysis and hazard modeling.
+
+- ***Prior $\pi(\theta)$:*** is the probability distribution that would ***express one's beliefs*** about this quantity ***before some evidence is taken into account***.
+
+- ***the deviance:*** is a goodness-of-fit statistic for a statistical model; it is often used for statistical hypothesis testing. It is a generalization of the idea of using the sum of squares of residuals (RSS) in ordinary least squares to cases where model-fitting is achieved by maximum likelihood.
+
 
 $$~$$
-We decide to consider the following logistic regression model with the logit link function: 
+
+# The First Model (link function with logit)
+
+$$~$$
+
+In the first model, we decide to consider the following logistic regression model with the logit link function: 
 
 $$
 Y_i \sim Bern(p_i) \\
@@ -624,15 +648,271 @@ $$
 \beta_{12} \sim N(\mu_{12} = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
 \beta_{13} \sim N(\mu_{13} = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
 $$
+
 The main reason is that we prefer chosing the binary classification as in this case the logistic regression to model our outcomes based only on 0 or 1.
+
+$$~$$
+
+### Implementing RJags
+
+$$~$$
+
+As we can see, we implemented the model using RJags:
+
+$$~$$
+
+- The model is defined as follows:
+
+$$~$$
+
+```{r}
+model <- function(){
+  # Likelihood
+  for (i in 1:N){
+    y[i] ~ dbern(p[i])
+    logit(p[i]) <-  beta2*x2[i] + beta3*x3[i] + beta4*x4[i] + beta8*x8[i] + beta9*x9[i] + beta10*x10[i] + beta11*x11[i] + beta12*x12[i] + beta13*x13[i] # omit intercept and not useful variables
+  }
+  
+  # Defining the prior beta parameters
+  beta2 ~ dnorm(-1, 1.0E-6)
+  beta3 ~ dnorm(0.5, 1.0E-6)
+  beta4 ~ dnorm(0, 1.0E-6)
+  beta8 ~ dnorm(0, 1.0E-6)
+  beta9 ~ dnorm(-0.5, 1.0E-6)
+  beta10 ~ dnorm(0.5, 1.0E-6)
+  beta11 ~ dnorm(0.5, 1.0E-6)
+  beta12 ~ dnorm(-0.5, 1.0E-6)
+  beta13 ~ dnorm(-0.5, 1.0E-6)
+}
+```
+
+***remark:*** that the standard deviation in RJags is considered as the precision, so the $\tau^2 = \frac{1}{\sigma^{2}}$
+
+$$~$$
+
+- Data structuring as requested with highlight which parameters to consider:
+
+```{r}
+# Passing the data for RJags
+data.jags <- list("y" = y, "N" = N,
+                  "x2" = x2, "x3" = x3, "x4" = x4, "x8" = x8, "x9" = x9, "x10" = x10, "x11" = x11, "x12" = x12, "x13" = x13)
+
+# Defining parameters of interest to show after running RJags
+mod.params <- c("beta2", "beta3", "beta4", "beta8", "beta9", "beta10", "beta11", "beta12", "beta13")
+```
+
+$$~$$
+
+- Running the model with the following results:
+
+```{r}
+# Run JAGS
+# set.seed(123)
+n.chains <- 3
+mod.fit <- jags(data = data.jags,                                                 # DATA
+                model.file = model,                                               # MODEL
+                parameters.to.save = mod.params,                                  # TRACKING
+                n.chains = n.chains, n.iter = 10000, n.burnin = 1000, n.thin=10)  # MCMC
+
+mod.fit
+```
+
+$$~$$
+
+In this last running of the MCMC we have interesting results:
+
+- ***mu.vect*** and ***sd.vect:*** these values representing the estimated values after simulating the MCMC.
+
+- ***the percentages (quantiles):*** represents the quantiles of the interval where the parameter is likely in
+
+- ***RHat:*** The values near 1 suggest convergence
+
+- ***n.eff:*** is the effective number of samples to achieve the convergence, the stationary region.
+
+$$~$$
+
+### The stationary regions
+
+$$~$$
+
+Here, we show the univariate trace-plots of the simulations of each parameter:
+
+```{r echo=FALSE, fig.align="center"}
+traceplot(mod.fit)
+```
+
 
 $$~$$
 
 ### The Cumulative Means
 
 $$~$$
+In this section we want to see the empirical average of $\mathbf{\hat{I}}_{t}$ increasing the value of $t \, = \, 1,...,T$. Before starting, we want to write the formula of $\mathbf{\hat{I}}_{t}$ that is:
+
+$$~$$
+
+$$
+\mathbf{I} \approx \mathbf{\hat{I}}_{t} = \frac{1}{T} \sum_{i=1}^{T} h(\theta^{(i)})
+$$
+
+$$~$$
+
+is important to write $\approx$ because this leverages the SLLN theorem and we want also to confirm this assumption! So, let's see the results:
+
+$$~$$
+
+```{r echo=FALSE}
+df <- as.data.frame(mod.fit$BUGSoutput$sims.array)
+  
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 1])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 2]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 3]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta10") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 4])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 5]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 6]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta11") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 7])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 8]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 9]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta12") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 10])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 11]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 12]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta13") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 10])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 11]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 12]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta2") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 13])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 14]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 15]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta3") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 16])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 17]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 18]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta4") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 19])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 20]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 21]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta8") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 22])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 23]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 24]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta9") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 25])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 26]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 27]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of deviance") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+```
+
+$$~$$
+
+### Some other interesting plots
+
+$$~$$
+
+We are considering other interesting plots, underlining also each chain alone:
+
+```{r echo=FALSE, fig.align="center"}
+# Plots with BayesPlot
+chainArray <- mod.fit$BUGSoutput$sims.array
+
+# considering to split each couples of parameters
+bayesplot::mcmc_combo(chainArray, pars = c("deviance", "beta2", "beta3"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta4", "beta8", "beta9", "beta10"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta11", "beta12", "beta13"))
+```
+
+$$~$$
+Now, we want to see the autocorrelations of each parameter:
+
+```{r echo=FALSE, fig.align="center", fig.width=10, fig.height=10}
+coda.fit <- coda::as.mcmc(mod.fit)
+coda::acfplot(coda.fit)
+
+autocorr.diag(as.mcmc(mod.fit))
+```
+
+$$~$$
+The ACFs follow good behaviours, because we need to have samples independent each other during new iterations. Here, we see that the correlations are going further from the first lag, this is strictly decreasing. So, this is a good point!
+
+We can conferm our intuition also with the values returned by autocorr.diag() that it returned the vector of the average autocorrelations across all chains.
+
+$$~$$
 
 ### The Approximation Errors
+
+$$~$$
+Here, we want to analyze the best approximation error for the MCMC sampling. We consider, essentially the square root of the MCSE.
+
+The variance formula in the MCMC samplig is:
+
+$$
+\mathbf{V}[\hat{I}_{t}] = \frac{Var_{\pi}[h(X_{1})]}{T_{eff}} = \Big( 1 + 2 \sum_{k=1}^{\infty} \rho_{k}\Big)\frac{\sigma^{2}}{T}
+$$
+in this case we want to consider the MCSE that is the square root of the formula written above, So the results are (for each chain):
+
+$$~$$
+
+```{r}
+n <- length(colnames(mod.fit$BUGSoutput$sims.matrix))
+mcse_dataframe <- data.frame(MCSE_Chain1 = rep(NA, n), MCSE_Chain2 = rep(NA, n), MCSE_Chain3 = rep(NA, n), MCSE_mean = rep(NA, n))
+rownames(mcse_dataframe) <- colnames(mod.fit$BUGSoutput$sims.matrix)[1:n] 
+
+for(colname in colnames(mod.fit$BUGSoutput$sims.matrix)[1:n]){
+  for(j in 1:n.chains)
+    mcse_dataframe[colname, j] <- LaplacesDemon::MCSE(mod.fit$BUGSoutput$sims.array[, j, colname])
+  mcse_dataframe[colname, "MCSE_mean"] <- mean(unlist(mcse_dataframe[colname, c(1:3)]))
+}
+
+mcse_dataframe
+```
+
+$$~$$
+
+### Hypothesis and Testing
+
+$$~$$
 
 $$~$$
 
@@ -641,6 +921,15 @@ $$~$$
 $$~$$
 
 ### The Correlations
+
+$$~$$
+Here, we bring the correlations between all the values calculated during the MCMC sampling, considering the joining matrix:
+
+```{r echo=FALSE}
+hchart(cor(mod.fit$BUGSoutput$sims.matrix)) %>%
+  hc_title(text = "Correlations between all the parameters calculated") # considering only the whole data
+```
+
 
 $$~$$
 
