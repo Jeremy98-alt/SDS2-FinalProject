@@ -61,7 +61,36 @@ $$~$$
 
 $$~$$
 
-# Introduction
+- <a href="#intro"> The Introduction </a>
+    + <a href="#thedataset"> The Dataset </a> 
+    + <a href="#dvs"> The Data Visualization </a>
+        + <a href="#pca"> The visualization using PCA </a>
+        + <a href="#tcd"> The Categorical Data </a>
+        + <a href="#tqd"> The Quantitative Data </a>
+        + <a href="#tc"> The Correlations </a>
+- <a href="#pbd"> Preliminary brief definitions </a>
+- <a href="#thegoal"> The Goal </a>
+    + <a href="#tfm"> The First Model (link function with logit) </a>
+        + <a href="#ir"> Implementing RJags </a>
+        + <a href="#tsr"> The stationary regions </a>
+        + <a href="#soip"> Some other interesting plots </a>
+        + <a href="#tcm"> The Cumulative Means </a>
+        + <a href="#tae"> The Approximation Error </a>
+        + <a href="#pu"> Posterior uncertainty </a>
+        + <a href="#tcest"> The Estimated Correlations </a>
+    + <a href="#htmc"> Hypotheses and Testing of the convergences of these multiple Markov chains </a>
+        + <a href="#ht"> Heidel Test </a>
+    + <a href="#cia"> Credible interval and the point estimates </a>
+    + <a href="#tp"> The Predictions </a>
+- <a href="tsm"> The Second Model </a>
+    + <a href="dic"> The comparison between these two models </a>
+- <a href="#conclusions"> The Conclusions </a>
+    + <a href="#finalconclusions"> ...Final Conclusions </a>
+    + <a href="#thereferences"> The References </a>
+
+$$~$$
+
+# <a id="intro"> The Introduction </a>
 
 $$~$$
 
@@ -71,7 +100,7 @@ Here in this project we explain and we try to predict whether a patient should b
 
 $$~$$
 
-## The Dataset
+## <a id="thedataset"> The Dataset </a>
 
 $$~$$
 
@@ -116,7 +145,7 @@ ol ul {
 7. ***restecg*** -> it refers to the resting electrocardiographic results: 
     + 0 as Normal
     + 1 having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV)
-    + 2) showing probable or definite left ventricular hypertrophy by Estes' criteria
+    + 2 showing probable or definite left ventricular hypertrophy by Estes' criteria
 8. ***thalachh*** -> it refers to the maximum heart rate achieved
 9. ***exng*** -> it refers to the exercise induced angina that could be:
     + 1 (yes)
@@ -127,7 +156,7 @@ ol ul {
     + 1 as flat
     + 2 as down sloping
 12. ***caa*** -> it refers to the number of major vessels that goes from 0 to 3
-13. ***thall*** -> it refers to the maximum heart rate achieved: 
+13. ***thall*** -> it refers to the diagnostic maximum heart rate achieved: 
     + 0 as no-data 
     + 1 as normal
     + 2 as fixed defect
@@ -146,7 +175,7 @@ summary(dat)
 
 $$~$$
 
-## The Data Visualization
+## <a id="dvs"> The Data Visualization </a>
 
 $$~$$
 
@@ -154,7 +183,7 @@ In this subsection we want to describe graphically the dataset that we are analy
 
 $$~$$
 
-### The visualization using PCA
+### <a id="pca"> The visualization using PCA </a>
 
 $$~$$
 
@@ -183,7 +212,7 @@ Its normal to denote that there could be some losses on this representation due 
 
 $$~$$
 
-## The Categorical Data
+## <a id="tcd"> The Categorical Data </a>
 
 $$~$$
 
@@ -526,7 +555,7 @@ output_dat %>%
 
 $$~$$
 
-## The Quantitative Data
+## <a id="tqd"> The Quantitative Data </a>
 
 $$~$$
 
@@ -557,7 +586,7 @@ dense.chart('oldpeak', 'Previous Peak')
 ```
 
 
-## The Correlations
+## <a id="tc"> The Correlations </a>
 
 $$~$$
 
@@ -576,7 +605,25 @@ hchart(cor(dat[, c(1:13)]), color = randomcoloR::randomColor()) %>%
   hc_title(text = "Correlations between all independent variables") # considering only the whole data
 ```
 
-# The Goal
+# <a id="pbd"> Preliminary brief definitions </a>
+
+$$~$$
+
+- ***Likelihood $\pi(y_{obs}|\theta)$:*** measures the goodness of fit of a statistical model to ***a sample of data for giving values of the unknown parameters***. It is formed from the joint probability distribution of the sample, but viewed and used as a function of the parameters only, thus treating the random variables as fixed at the observed values.
+
+- ***Logistic regression model:*** Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables.
+
+- ***logit link function:*** it uses the Cumulative Distribution Function (CDF) of the logistic distribution. A benefit to using Logit is that the coefficients can be interpreted in the terms of odds ratios.
+
+- ***cloglog function:*** Is unlike Logit and Probit asymmetric. It is best used when the probability of an event is very small or very large.  The complementary log-log approaches 0 infinitely slower than any other link function. Cloglog model is closely related to continuous-time models for the occurrence of events, so it has an important application in the area of survival analysis and hazard modeling.
+
+- ***Prior $\pi(\theta)$:*** is the probability distribution that would ***express one's beliefs*** about this quantity ***before some evidence is taken into account***.
+
+- ***the deviance:*** is a goodness-of-fit statistic for a statistical model; it is often used for statistical hypothesis testing. It is a generalization of the idea of using the sum of squares of residuals (RSS) in ordinary least squares to cases where model-fitting is achieved by maximum likelihood.
+
+$$~$$
+
+# <a id="thegoal"> The Goal </a>
 
 $$~$$
 
@@ -608,7 +655,7 @@ x11 <- as.vector(dat$slp) # Slope
 x12 <- as.vector(dat$caa) # number of major vessels (0-3)
 x13 <- as.vector(dat$thall) # Thal rate
 
-summary(glm(y ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11+x12+x13, family = binomial(),data=dat))
+summary(glm(y ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11+x12+x13, family = binomial(link = "logit"),data=dat))
 ```
 
 $$~$$
@@ -626,26 +673,7 @@ then, in summary we have N = 302 observations. Then we decided to consider two m
 
 $$~$$
 
-# Preliminary brief definitions
-
-$$~$$
-
-- ***Likelihood $\pi(y_{obs}|\theta)$:*** measures the goodness of fit of a statistical model to ***a sample of data for given values of the unknown parameters***. It is formed from the joint probability distribution of the sample, but viewed and used as a function of the parameters only, thus treating the random variables as fixed at the observed values.
-
-- ***Logistic regression model:*** Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables.
-
-- ***logit link function:*** it uses the Cumulative Distribution Function (CDF) of the logistic distribution. A benefit to using Logit is that the coefficients can be interpreted in the terms of odds ratios.
-
-- ***cloglog function:*** Is unlike Logit and Probit asymmetric. It is best used when the probability of an event is very small or very large.  The complementary log-log approaches 0 infinitely slower than any other link function. Cloglog model is closely related to continuous-time models for the occurrence of events, so it has an important application in the area of survival analysis and hazard modeling.
-
-- ***Prior $\pi(\theta)$:*** is the probability distribution that would ***express one's beliefs*** about this quantity ***before some evidence is taken into account***.
-
-- ***the deviance:*** is a goodness-of-fit statistic for a statistical model; it is often used for statistical hypothesis testing. It is a generalization of the idea of using the sum of squares of residuals (RSS) in ordinary least squares to cases where model-fitting is achieved by maximum likelihood.
-
-
-$$~$$
-
-# The First Model (link function with logit)
+# <a id="tfm"> The First Model (link function with logit) </a>
 
 $$~$$
 
@@ -673,7 +701,7 @@ The main reason is that we prefer chosing the binary classification as in this c
 
 $$~$$
 
-### Implementing RJags
+### <a id="ir"> Implementing RJags </a>
 
 $$~$$
 
@@ -758,7 +786,7 @@ just to have a look, let’s check how the fitting curve look like if we use the
 
 $$~$$
 
-### The stationary regions
+### <a id="tsr"> The stationary regions </a>
 
 $$~$$
 
@@ -771,7 +799,42 @@ traceplot(mod.fit)
 
 $$~$$
 
-### The Cumulative Means
+### <a id="soip"> Some other interesting plots </a>
+
+$$~$$
+
+We are considering other interesting plots, underlining also each chain alone:
+
+```{r echo=FALSE, fig.align="center"}
+# Plots with BayesPlot
+chainArray <- mod.fit$BUGSoutput$sims.array
+
+# considering to split each couples of parameters
+bayesplot::mcmc_combo(chainArray, pars = c("deviance", "beta2", "beta3"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta4", "beta8", "beta9", "beta10"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta11", "beta12", "beta13"))
+```
+
+$$~$$
+
+Now, we want to see the autocorrelations of each parameter:
+
+```{r echo=FALSE, fig.align="center", fig.width=10, fig.height=10}
+coda.fit <- coda::as.mcmc(mod.fit)
+coda::acfplot(coda.fit)
+
+autocorr.diag(as.mcmc(mod.fit))
+```
+
+$$~$$
+
+The ACFs follow good behaviours, because we need to have samples independent each other during new iterations. Here, we see that the correlations are going further from the first lag, this is strictly decreasing. So, this is a good point!
+
+We can conferm our intuition also with the values returned by autocorr.diag() that it returned the vector of the average autocorrelations across all chains.
+
+$$~$$
+
+### <a id="tcm"> The Cumulative Means </a>
 
 $$~$$
 In this section we want to see the empirical average of $\mathbf{\hat{I}}_{t}$ increasing the value of $t \, = \, 1,...,T$. Before starting, we want to write the formula of $\mathbf{\hat{I}}_{t}$ that is:
@@ -874,42 +937,10 @@ df %>%
 
 $$~$$
 
-### Some other interesting plots
+### <a id="tae"> The Approximation Error </a>
 
 $$~$$
 
-We are considering other interesting plots, underlining also each chain alone:
-
-```{r echo=FALSE, fig.align="center"}
-# Plots with BayesPlot
-chainArray <- mod.fit$BUGSoutput$sims.array
-
-# considering to split each couples of parameters
-bayesplot::mcmc_combo(chainArray, pars = c("deviance", "beta2", "beta3"))
-bayesplot::mcmc_combo(chainArray, pars = c("beta4", "beta8", "beta9", "beta10"))
-bayesplot::mcmc_combo(chainArray, pars = c("beta11", "beta12", "beta13"))
-```
-
-$$~$$
-Now, we want to see the autocorrelations of each parameter:
-
-```{r echo=FALSE, fig.align="center", fig.width=10, fig.height=10}
-coda.fit <- coda::as.mcmc(mod.fit)
-coda::acfplot(coda.fit)
-
-autocorr.diag(as.mcmc(mod.fit))
-```
-
-$$~$$
-The ACFs follow good behaviours, because we need to have samples independent each other during new iterations. Here, we see that the correlations are going further from the first lag, this is strictly decreasing. So, this is a good point!
-
-We can conferm our intuition also with the values returned by autocorr.diag() that it returned the vector of the average autocorrelations across all chains.
-
-$$~$$
-
-### The Approximation Error
-
-$$~$$
 Here, we want to analyze the best approximation error for the MCMC sampling. We consider, essentially the square root of the MCSE.
 
 The variance formula in the MCMC samplig is:
@@ -917,6 +948,7 @@ The variance formula in the MCMC samplig is:
 $$
 \mathbf{V}[\hat{I}_{t}] = \frac{Var_{\pi}[h(X_{1})]}{t_{eff}} = \Big( 1 + 2 \sum_{k=1}^{\infty} \rho_{k}\Big)\frac{\sigma^{2}}{T}
 $$
+
 where $t_{eff}$ is the effective sample size (ESS). The idea is to have a sort of “exchange rate” between dependent and independent samples. 
 
 We can say, if we have 1,000 samples from a certain Markov chain are worth about as much as 70 independent samples because the MCMC samples are highly correlated. 
@@ -952,13 +984,15 @@ mcse_dataframe
 ```
 
 $$~$$
+
 As we can see the $\beta_2$ has the highest uncertainty considering the jointly chains.
 
 $$~$$
 
-### Posterior uncertainty
+### <a id="pu"> Posterior uncertainty </a>
 
 $$~$$
+
 The uncertainty is measured by using the variability of the parameter w.r.t. its absolute expectation:
 
 ```{r echo=FALSE}
@@ -973,14 +1007,30 @@ The highest posterior uncertainty is about the $\beta_4$.
 
 $$~$$
 
-## Hypotheses and Testing of the convergences of these multiple Markov chains 
+### <a id="tcest"> The Estimated Correlations </a>
 
 $$~$$
+
+Here, we bring the correlations between all the values calculated during the MCMC sampling, considering the joining matrix:
+
+```{r echo=FALSE}
+hchart(cor(mod.fit$BUGSoutput$sims.matrix)) %>%
+  hc_title(text = "Correlations between all the parameters calculated") # considering only the whole data
+```
+
+the highest correlation is between $\beta_4 \text{ and } \beta_8$.
+
+$$~$$
+
+## <a id="htmc"> Hypotheses and Testing of the convergences of these multiple Markov chains </a>
+
+$$~$$
+
 Here, we want to understand if we achieve with these multiple simulations of the markov chains the convergences. We are considering one of the tools saw in the last lectures, to understand if we achieve or not the convergency this is more powerful than the other tools.
 
 $$~$$
 
-## Heidel Test
+## <a id="ht"> Heidel Test </a>
 
 $$~$$
 Implements a convergence diagnostic, and removes up to half the chain in order to ensure that the means are estimated from a chain that has converged.
@@ -1002,13 +1052,38 @@ coda::heidel.diag(coda.fit)
 ```
 
 $$~$$
+
 We prefer considering the Heidel test because it is a double check of the stationarity and the convergency states. This is sometimes failed, meanwhile the other tools seems to be good, so I prefer considering this test.
 
 Here, we can see all is considered correctly, so our intuitions are correct!
 
 $$~$$
 
-### The Predictions
+## <a id="cia"> Credible interval and the point estimates </a>
+
+$$~$$
+
+After checking that the simulations returned to pass the convergence, we can decide to pool up all the chains and does the credible interval and the point estimates for our beta values estimated:
+
+```{r}
+chainMat <- mod.fit$BUGSoutput$sims.matrix
+
+# Point estimates
+(beta.hat.jags <- colMeans(chainMat))
+
+# Credible Intervals
+cred <- 0.95
+(p.ET.jags <- apply(chainMat, 2, quantile, 
+                    prob=c((1-cred)/2, 1-(1-cred)/2)))
+
+# What about the HPD?
+(p.HPD.jags <- coda::HPDinterval(as.mcmc(chainMat)))
+```
+
+
+$$~$$
+
+## <a id="tp"> The Predictions </a>
 
 $$~$$
 
@@ -1047,22 +1122,7 @@ After read, the whole project report we will see which is the best model here in
 
 $$~$$
 
-### The Correlations
-
-$$~$$
-
-Here, we bring the correlations between all the values calculated during the MCMC sampling, considering the joining matrix:
-
-```{r echo=FALSE}
-hchart(cor(mod.fit$BUGSoutput$sims.matrix)) %>%
-  hc_title(text = "Correlations between all the parameters calculated") # considering only the whole data
-```
-
-the highest correlation is between $\beta_4 \text{ and } \beta_8$.
-
-$$~$$
-
-# The Second Model
+# <a id="tsm"> The Second Model </a>
 
 $$~$$
 Now, we want to focus to another model always the logistic regression with the whole features and a new link function, the ***cloglog function***.
@@ -1081,7 +1141,7 @@ model2 <- function(){
   # Likelihood
   for (i in 1:N){
     y[i] ~ dbern(p[i])
-    cloglog(p[i]) <-  beta1*x1[i] + beta2*x2[i] + beta3*x3[i] + beta4*x4[i] + beta5*x5[i] + beta6*x6[i] + beta7*x7[i] + beta8*x8[i] + beta9*x9[i] + beta10*x10[i] + beta11*x11[i] + beta12*x12[i] + beta13*x13[i] # omit intercept and not useful variables
+    cloglog(p[i]) <-  beta1*x1[i]^2 + beta2*x2[i] + beta3*x3[i] + beta4*x4[i]^2 + beta5*x5[i]^3 + beta6*x6[i] + beta7*x7[i] + beta8*x8[i] + beta9*x9[i] + beta10*x10[i] + beta11*x11[i] + beta12*x12[i]^3 + beta13*x13[i] # omit intercept and not useful variables
   }
   
   # Defining the priors
@@ -1125,9 +1185,10 @@ Can you see something different? Seems yes.. see the DIC! Is better the previous
 
 $$~$$
 
-# The comparison between these two models
+# <a id="dic"> The comparison between these two models </a>
 
 $$~$$
+
 As we can see above, we tried to make a different model only changing the link function to see if it is better to associate with our data, the DIC (Deviance information criterion) is our indicator that says to us which is the better model.
 
 The deviance information criterion (DIC) is a hierarchical modeling generalization of the Akaike information criterion (AIC). It is particularly useful in Bayesian model selection problems where the posterior distributions of the models have been obtained by Markov chain Monte Carlo (MCMC) simulation. DIC is an asymptotic approximation as the sample size becomes large, like AIC.
@@ -1137,6 +1198,7 @@ the DIC is calculated as:
 $$
 DIC = p_D + \overline{D(\theta)}
 $$
+
 where: 
 
 - there are two calculations in common usage for the effective number of parameters of the model. 
@@ -1151,7 +1213,7 @@ Lower is the DIC value better is the accuracy of the model, in this case is bett
 
 $$~$$
 
-# The Conclusions
+# <a id="conclusions"> The Conclusions </a>
 
 $$~$$
 We try to plot the logistic regression using the parameters obtained in the first model, we compare the line for each parameter-response variable:
@@ -1249,7 +1311,7 @@ We prefer considering to show only the significant ones.
 
 $$~$$
 
-## ... Final conclusions
+## <a id="finalconclusions"> ... Final conclusions </a>
 
 $$~$$
 
@@ -1261,7 +1323,7 @@ So thanks for all!
 
 $$~$$
 
-# The References
+# <a id="#thereferences"> The References </a>
 
 $$~$$
 
