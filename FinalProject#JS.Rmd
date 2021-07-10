@@ -79,12 +79,16 @@ $$~$$
         + <a href="#pu"> Posterior uncertainty </a>
         + <a href="#tcest"> The Estimated Correlations </a>
     + <a href="#htmc"> Hypotheses and Testing of the convergences of these multiple Markov chains </a>
+        + <a href="#raftery"> Raftery & Lewis Test </a>
+        + <a href="#geweke"> Geweke Test </a>
+        + <a href="#gelman"> Gelman Test </a>
         + <a href="#ht"> Heidel Test </a>
     + <a href="#cia"> Credible interval and the point estimates </a>
     + <a href="#tp"> The Predictions </a>
 - <a href="tsm"> The Second Model </a>
-    + <a href="dic"> The comparison between these two models </a>
+    + <a href="dic"> The comparison between these two models (DIC) </a>
 - <a href="#conclusions"> The Conclusions </a>
+    + <a href="simulatedata"> Simulation for parameters recovery </a>
     + <a href="#finalconclusions"> ...Final Conclusions </a>
     + <a href="#thereferences"> The References </a>
 
@@ -174,12 +178,21 @@ summary(dat)
 ```
 
 $$~$$
+As we can see above: 
+
+- the people captured in this datasets represent people between 29 and 77 years, so is evident that there isn't any teenager in this dataset. Because, there is a low probability that the teenagers have the heart attack in their young ages.
+- the genders in this dataset are equally distributed between females and males.
+- for the output features, we observed that there is again an equally distribution between people that have heart attack and not.
+
+Other features of this dataset could be easily see in this summary, so let's go to the data visualization for having a good visualizations of which data we are treating!
+
+$$~$$
 
 ## <a id="dvs"> The Data Visualization </a>
 
 $$~$$
 
-In this subsection we want to describe graphically the dataset that we are analyzing to have a first taste of what is the better model to use in this case, we want to show below some interesting plots
+In this subsection we want to describe graphically the dataset that we are analyzing to have a first taste of what is the better model to use in this case, we want to show below some interesting plots:
 
 $$~$$
 
@@ -193,7 +206,7 @@ $$~$$
 
 ```{r echo=FALSE, fig.align="center"}
 # for visualization
-res.pca <- prcomp(dat, scale = TRUE, center = TRUE) # compute PCA
+res.pca <- prcomp(dat, scale = FALSE) # compute PCA
 
 # patients  with a similar profile are grouped together
 fviz_pca_ind(res.pca,
@@ -208,7 +221,7 @@ fviz_eig(res.pca) # Show the percentage of variances explained by each principal
 
 $$~$$
 
-Its normal to denote that there could be some losses on this representation due to the amount of features that we want to consider, but here we actually capture 34.9% of variance in the entire dataset using two principal components. 
+Its normal to denote that there could be some losses on this representation due to the amount of features that we want to consider, but here we actually recover ***89.8%*** of variance in the entire dataset using two principal components, so this is a good result. 
 
 $$~$$
 
@@ -572,6 +585,7 @@ hist.and.summary('oldpeak', 'Previous Peak')
 ```
 
 $$~$$
+As we can see above, the distribution of these data are different and several are more similar, for example if you compare the maximum heart rate and the age of the people these distributions are different! So, these considerations could be useful for predicting the heart attack.
 
 After this, we consider also the densities considering the case of having the heart attack and not:
 
@@ -604,6 +618,17 @@ hchart(cor(dat[, c("age", "chol", "thalachh", "trtbps", "oldpeak")]), color = ra
 hchart(cor(dat[, c(1:13)]), color = randomcoloR::randomColor()) %>%
   hc_title(text = "Correlations between all independent variables") # considering only the whole data
 ```
+
+With these correlation maps we see some interesting correlations is important to denote that the quantitative variables are more significant than the qualitative variables, because we are treating the quantitative measures, but here we can highlight and consider also the qualitative variables. So, here we denote in the complete map that the:
+
+- thalachh and age $\rightarrow$ have ***-0.40*** of correlations
+- cp and exng $\rightarrow$ have ***-0.39*** of correlations
+- thalachh and exng $\rightarrow$ have ***-0.38*** of correlations
+- slp and oldpeak $\rightarrow$ have ***-0.58*** of correlations
+
+seems that these variables will be important in our predictions later, we will see in few moment if it is in this way!
+
+$$~$$
 
 # <a id="pbd"> Preliminary brief definitions </a>
 
@@ -669,7 +694,17 @@ As we can see above, the glm rejects the hypothesis to consider the variables:
 
 ... and also the ***intercept*** isn't a good choice to admit it in our model.
 
-then, in summary we have N = 302 observations. Then we decided to consider two models and see the difference on which model at the end is the best model of our analysis.
+An important remark to highlight is that we tried to do the frequentist approach of these data and we should remember that considering all of the features we achieved 238.35 as AIC value.
+
+But, if we try with the features that we decide to consider in the next steps?
+
+```{r echo="FALSE"}
+summary(glm(y ~ x2+x3+x4+x8+x9+x10+x11+x12+x13, family = binomial(link = "logit"),data=dat))
+```
+
+The behaviour is slightly changed, we have 234.19 as AIC value, we will see if we achieve the same result!
+
+Then, in summary we have N = 302 observations. Then we decided to consider two models and see the difference on which model at the end is the best model of our analysis.
 
 $$~$$
 
@@ -1026,7 +1061,54 @@ $$~$$
 
 $$~$$
 
-Here, we want to understand if we achieve with these multiple simulations of the markov chains the convergences. We are considering one of the tools saw in the last lectures, to understand if we achieve or not the convergency this is more powerful than the other tools.
+Here, we want to understand if we achieve with these multiple simulations of the markov chains the convergences and the validity. We are considering different tools saw in the last lectures, to understand if we achieve or not the convergency, the tools utilized are:
+
+- The Raftery & Lewis Diagnostic
+- The Geweke Diagnostic 
+- The Gelman Diagnostic
+- The Heidel Diagnostic
+
+$$~$$
+
+## <a id="raftery"> Raftery & Lewis Test </a>
+
+$$~$$
+Introduced an MCMC diagnostic that estimates the number of iterations needed for a given level of precision in posterior samples, as well as estimating burn-in, when quantiles are the posterior summaries of interest.
+
+```{r}
+coda::raftery.diag(coda.fit)
+```
+
+
+$$~$$
+
+## <a id="geweke"> Geweke Test </a>
+
+$$~$$
+This diagnostic is based on a ***test for equality of the means of the first and last part of a Markov chain*** (by default the first 10% and the last 50%). If the samples are drawn from a stationary distribution of the chain, then the two means are equal and Geweke's statistic has an asymptotically standard normal distribution.
+
+The test statistic is a standard Z-score: the difference between the two sample means divided by its estimated standard error. The standard error is estimated from the spectral density at zero, and so takes into account any autocorrelation.
+
+The Z-score is calculated under the assumption that the two parts of the chain are asymptotically independent.
+
+```{r}
+coda::geweke.diag(coda.fit)
+```
+
+$$~$$
+
+## <a id="gelman"> Gelman Test </a>
+
+$$~$$
+
+The `potential scale reduction factor' is calculated for each variable in x, together with upper and lower confidence limits. ***Approximate convergence is diagnosed when the upper limit is close to 1***. For multivariate chains, a multivariate value is calculated that bounds above the potential scale reduction factor for any linear combination of the (possibly transformed) variables.
+
+The confidence limits are based on the assumption that the stationary distribution of the variable under examination is normal. Hence the `transform' parameter may be used to improve the normal approximation.
+
+```{r}
+coda::gelman.diag(coda.fit)
+```
+
 
 $$~$$
 
@@ -1080,6 +1162,7 @@ cred <- 0.95
 (p.HPD.jags <- coda::HPDinterval(as.mcmc(chainMat)))
 ```
 
+It's relevant to conclude that all your parameters (and its variables) are significant to predict heart attacks (except for $\beta_4$)
 
 $$~$$
 
@@ -1185,7 +1268,7 @@ Can you see something different? Seems yes.. see the DIC! Is better the previous
 
 $$~$$
 
-# <a id="dic"> The comparison between these two models </a>
+# <a id="dic"> The comparison between these two models (DIC) </a>
 
 $$~$$
 
@@ -1311,6 +1394,84 @@ We prefer considering to show only the significant ones.
 
 $$~$$
 
+## <a id="simulatedata"> Simulation for parameters recovery </a>
+
+$$~$$
+Now, we understood that the first model is better than the second. So, for checking that the model proposed can correctly recover the model parameters. I Executed the simulation considering the data simulated from the model proposed, the beta parameters checked are the estimated from the first model:
+
+- $\beta_2 \rightarrow -1.65$
+- $\beta_3 \rightarrow 0.88$
+- $\beta_4 \rightarrow -0.01$
+- $\beta_8 \rightarrow 0.03$
+- $\beta_9 \rightarrow -0.88$
+- $\beta_{10} \rightarrow -0.48$
+- $\beta_{11} \rightarrow 0.68$
+- $\beta_{12} \rightarrow -0.84$
+- $\beta_{13} \rightarrow -0.85$
+
+```{r echo=FALSE}
+# Simulate data ------
+
+# Pick sample size
+N <- 302
+
+# Pick fixed values for the parameters of the model
+beta_2 <- -1.65
+beta_3 <- 0.88
+beta_4 <- -0.01
+beta_8 <- 0.03
+beta_9 <- -0.88
+beta_10 <- -0.48
+beta_11 <- 0.68
+beta_12 <- -0.84
+beta_13 <- -0.85
+
+# Simulate the independent variables
+sim_dat <- data.frame("sim_x2" = rbinom(N, 0:1, prob = mean(x2)),
+                      "sim_x3" = rbinom(N, 0:3, prob = mean(x3)),
+                      "sim_x4" = round(rnorm(N, mean = mean(x4), sd = sd(x4))),
+                      "sim_x8" = round(rnorm(N, mean = mean(x8), sd = sd(x8))),
+                      "sim_x9" = rbinom(N, 0:1, prob = mean(x9)),
+                      "sim_x10" = round(rnorm(N, mean = mean(x10), sd = sd(x10)),1),
+                      "sim_x11" = rbinom(N, 0:2, prob = mean(x11)-1),
+                      "sim_x12" = rbinom(N, 0:3, prob = mean(x12)),
+                      "sim_x13" = rbinom(N, 0:3, prob = mean(x13)-2)
+          )
+
+# Simulate response according to the model
+linpred <- beta_2*sim_dat$sim_x2 + beta_3*sim_dat$sim_x3 + beta_4*sim_dat$sim_x4 + beta_8*sim_dat$sim_x8 + beta_9*sim_dat$sim_x9 + beta_10*sim_dat$sim_x10 + beta_11*sim_dat$sim_x11 + beta_12*sim_dat$sim_x12 + beta_13*sim_dat$sim_x13
+
+pis <- 1/(1+exp(-linpred))
+
+r <- rbinom(N, 0:1, prob = pis)
+
+sim_dat$output <- r
+
+# Considering the first model, we change the parameters passed..
+
+# Passing the data for RJags
+sim_data.jags <- list("y" = sim_dat$output, "N" = N,
+                  "x2" = sim_dat$sim_x2, "x3" = sim_dat$sim_x3, 
+                  "x4" = sim_dat$sim_x4, "x8" = sim_dat$sim_x8, 
+                  "x9" = sim_dat$sim_x9, "x10" = sim_dat$sim_x10, 
+                  "x11" = sim_dat$sim_x11, "x12" = sim_dat$sim_x12, 
+                  "x13" = sim_dat$sim_x13)
+
+# Run JAGS
+set.seed(123)
+n.chains <- 3
+mod.fit_sim <- jags(data = sim_data.jags,                                                 # DATA
+                model.file = model,                                               # MODEL
+                parameters.to.save = mod.params,                                  # TRACKING
+                n.chains = n.chains, n.iter = 10000, n.burnin = 1000, n.thin=10)  # MCMC
+
+mod.fit_sim
+```
+
+The values are slighlty the same, so the parameters chose are perfectly good!
+
+$$~$$
+
 ## <a id="finalconclusions"> ... Final conclusions </a>
 
 $$~$$
@@ -1346,3 +1507,5 @@ $$~$$
 9. Logistic Regression Bayesian Model R - [BayesBall] https://bayesball.github.io/BOOK/bayesian-multiple-regression-and-logistic-models.html
 
 10. Typical Angina - [NCBI] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5680106
+
+11. RDocumentations - [RDocumention] https://www.rdocumentation.org
