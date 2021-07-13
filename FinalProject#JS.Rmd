@@ -1,10 +1,22 @@
----
-title: "Guessing, if there is a Heart Attack or not"
-subtitle: "Statistical Methods and Laboratory, Part II - The Final Project"
-author: "Sapienza Jeremy 1960498"
-date: "6/18/2021"
-output: html_document
----
+$$~$$
+
+<center>![](./img/uniroma1.png){width=40%}</center>
+
+<center> The Final Project </center>
+
+$$~$$
+
+<center> Author $\rightarrow$ Jeremy Sapienza 1960498 </center>
+
+<center> <i> Statitics for Data Science and Laboratory II </i> </center>
+<center> <b> "La Sapienza" University of Rome</b> </center>
+<center> July 21th 2021 </center>
+
+$$~$$ 
+
+<center> <b> <font size="6"> Guessing, if there is a Heart Attack or not </font> </b> </center>
+
+$$~$$ 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -69,7 +81,7 @@ $$~$$
         + <a href="#tqd"> The Quantitative Data </a>
         + <a href="#tc"> The Correlations </a>
 - <a href="#pbd"> Preliminary brief definitions </a>
-- <a href="#thegoal"> The Goal </a>
+- <a href="#thegoal"> The Goal (+ Cheating and using the Frequentistic Logistic Regression Approach) </a>
     + <a href="#tfm"> The First Model (link function with logit) </a>
         + <a href="#ir"> Implementing RJags </a>
         + <a href="#tsr"> The stationary regions </a>
@@ -85,10 +97,13 @@ $$~$$
         + <a href="#ht"> Heidel Test </a>
     + <a href="#cia"> Credible interval and the point estimates </a>
     + <a href="#tp"> The Predictions </a>
-- <a href="tsm"> The Second Model </a>
-    + <a href="dic"> The comparison between these two models (DIC) </a>
+- <a href="#tsm"> The Second Model </a>
+    + <a href="#dic"> The comparison between these two models (DIC) </a>
+        + <a href="#aic"> Akaike Information Criterion (AIC) </a>
+        + <a href="#bic"> Bayesian Information Criterion (BIC) </a>
+        + <a href="#comparedallcriteria"> Comparing DIC, AIC, BIC </a>
 - <a href="#conclusions"> The Conclusions </a>
-    + <a href="simulatedata"> Simulation for parameters recovery </a>
+    + <a href="#simulatedata"> Simulation for parameters recovery </a>
     + <a href="#finalconclusions"> ...Final Conclusions </a>
     + <a href="#thereferences"> The References </a>
 
@@ -648,7 +663,7 @@ $$~$$
 
 $$~$$
 
-# <a id="thegoal"> The Goal </a>
+# <a id="thegoal"> The Goal (+ Cheating and using the Frequentistic Logistic Regression Approach) </a>
 
 $$~$$
 
@@ -704,7 +719,7 @@ summary(glm(y ~ x2+x3+x4+x8+x9+x10+x11+x12+x13, family = binomial(link = "logit"
 
 The behaviour is slightly changed, we have 234.19 as AIC value, we will see if we achieve the same result!
 
-Then, in summary we have N = 302 observations. Then we decided to consider two models and see the difference on which model at the end is the best model of our analysis.
+Then, in summary we have N = 302 observations and we considered these features after manually checks which are the best to consider, we adopted the technique of feature engineering. Then we decided to consider two models and see the difference on which model at the end is the best model of our analysis.
 
 $$~$$
 
@@ -721,15 +736,7 @@ $$
 The prior beta parameters are chosen approximatly considering the estimated averages saw in the previous subsection regarding the outcomes of glm(). So, the beta prior parameters are distributed following a normal distribution as follows:
 
 $$
-\beta_2 \sim N(\mu_2 = -1, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_3 \sim N(\mu_3 = 0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_4 \sim N(\mu_4 = 0, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_8 \sim N(\mu_8 = 0, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_9 \sim N(\mu_9 = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_{10} \sim N(\mu_{10} = 0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_{11} \sim N(\mu_{11} = 0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_{12} \sim N(\mu_{12} = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
-\beta_{13} \sim N(\mu_{13} = -0.5, \tau^{2} = 1.0 \cdot 10^{-6}) \\
+\beta_i \sim N(\mu = 0, \tau^2 = 1.0^{-6})  \,\,\, for \,\, i \,\, = 2,3,4,8,9,..,13
 $$
 
 The main reason is that we prefer chosing the binary classification as in this case the logistic regression to model our outcomes based only on 0 or 1.
@@ -757,15 +764,15 @@ model <- function(){
   }
   
   # Defining the prior beta parameters
-  beta2 ~ dnorm(-1, 1.0E-6)
-  beta3 ~ dnorm(0.5, 1.0E-6)
+  beta2 ~ dnorm(0, 1.0E-6)
+  beta3 ~ dnorm(0, 1.0E-6)
   beta4 ~ dnorm(0, 1.0E-6)
   beta8 ~ dnorm(0, 1.0E-6)
-  beta9 ~ dnorm(-0.5, 1.0E-6)
-  beta10 ~ dnorm(0.5, 1.0E-6)
-  beta11 ~ dnorm(0.5, 1.0E-6)
-  beta12 ~ dnorm(-0.5, 1.0E-6)
-  beta13 ~ dnorm(-0.5, 1.0E-6)
+  beta9 ~ dnorm(0, 1.0E-6)
+  beta10 ~ dnorm(0, 1.0E-6)
+  beta11 ~ dnorm(0, 1.0E-6)
+  beta12 ~ dnorm(0, 1.0E-6)
+  beta13 ~ dnorm(0, 1.0E-6)
 }
 ```
 
@@ -795,7 +802,7 @@ n.chains <- 3
 mod.fit <- jags(data = data.jags,                                                 # DATA
                 model.file = model,                                               # MODEL
                 parameters.to.save = mod.params,                                  # TRACKING
-                n.chains = n.chains, n.iter = 10000, n.burnin = 1000, n.thin=10)  # MCMC
+                n.chains = n.chains, n.iter = 10000, n.burnin = 1000)  # MCMC
 
 mod.fit
 ```
@@ -811,13 +818,6 @@ In this last running of the MCMC we have interesting results:
 - ***RHat:*** The values near 1 suggest convergence
 
 - ***n.eff:*** is the effective number of samples to achieve the convergence, the stationary region.
-
-just to have a look, let’s check how the fitting curve look like if we use the obtained estimates:
-
-```{r echo=FALSE}
-
-
-```
 
 $$~$$
 
@@ -1178,7 +1178,7 @@ $$
 
 where the $\theta$ is equal to the coefficients used and considered before, $\Theta$ is the parameter space and $\pi(\theta)$ is the product of the priors thanks to marginal independence assumption. At the end, we want to smaple from the $\pi(\theta)$ and from $f(y_{new}|\theta, Y_{old}, x_2, x_3, x_4, x_8, x_9, x_{10}, x_{11}, x_{12}, x_{13})$. 
 
-Here, there is a brief practical example:
+Here, there is a brief practical example where we predict 302 new random observations:
 
 ```{r}
 new_record <- list(x2 = sample(x2, 1, replace = T), x3 = sample(x3, 1, replace = T), x4 = sample(x4, 1, replace = T), x8 = sample(x8, 1, replace = T), x9 = sample(x9, 1, replace = T),
@@ -1201,7 +1201,7 @@ hchart(y_pred, type = "column", name = "model1", color = randomcoloR::randomColo
   hc_plotOptions(column=list(depth= 100))
 ```
 
-After read, the whole project report we will see which is the best model here in terms of predictions, stay tuned! 
+After read, the whole project report we will see which is the best model here in terms of predictions... stay tuned! 
 
 $$~$$
 
@@ -1224,34 +1224,27 @@ model2 <- function(){
   # Likelihood
   for (i in 1:N){
     y[i] ~ dbern(p[i])
-    cloglog(p[i]) <-  beta1*x1[i]^2 + beta2*x2[i] + beta3*x3[i] + beta4*x4[i]^2 + beta5*x5[i]^3 + beta6*x6[i] + beta7*x7[i] + beta8*x8[i] + beta9*x9[i] + beta10*x10[i] + beta11*x11[i] + beta12*x12[i]^3 + beta13*x13[i] # omit intercept and not useful variables
+    cloglog(p[i]) <-  beta4*x4[i]^2 + beta5*x5[i] + beta6*x6[i] + beta7*x7[i] + beta8*x8[i] + beta13*x13[i] # omit intercept and not useful variables
   }
   
   # Defining the priors
-  beta1 ~ dnorm(0, 1.0E-6)
-  beta2 ~ dnorm(-1, 1.0E-6)
-  beta3 ~ dnorm(0.5, 1.0E-6)
   beta4 ~ dnorm(0, 1.0E-6)
   beta5 ~ dnorm(0, 1.0E-6)
   beta6 ~ dnorm(0, 1.0E-6)
-  beta7 ~ dnorm(0.5, 1.0E-6)
+  beta7 ~ dnorm(0, 1.0E-6)
   beta8 ~ dnorm(0, 1.0E-6)
-  beta9 ~ dnorm(-0.5, 1.0E-6)
-  beta10 ~ dnorm(0.5, 1.0E-6)
-  beta11 ~ dnorm(0.5, 1.0E-6)
-  beta12 ~ dnorm(-0.5, 1.0E-6)
-  beta13 ~ dnorm(-0.5, 1.0E-6)
+  beta13 ~ dnorm(0, 1.0E-6)
 }
 
 # Passing the data for RJags
 data.jags2 <- list("y" = y, "N" = N,
-                  "x1" = x1, "x2" = x2, "x3" = x3, "x4" = x4, 
-                  "x5" = x5, "x6" = x6, "x7" = x7, "x8" = x8, 
-                  "x9" = x9, "x10" = x10, "x11" = x11, "x12" = x12, "x13" = x13)
+                  "x4" = x4, "x5" = x5, "x6" = x6, 
+                  "x7" = x7, "x8" = x8, "x13" = x13)
 
 # Defining parameters of interest to show after running RJags
-mod.params2 <- c("beta1", "beta2", "beta3", "beta4", "beta5", "beta6", "beta7", "beta8", "beta9", "beta10", "beta11", "beta12", "beta13")
+mod.params2 <- c("beta4", "beta5", "beta6", "beta7", "beta8", "beta13")
 
+set.seed(123)
 mod.fit2 <- jags(data = data.jags2,                                               # DATA
                 model.file = model2,                                             # MODEL
                 parameters.to.save = mod.params2,                                # TRACKING
@@ -1293,6 +1286,87 @@ The larger the effective number of parameters is, the easier it is for the model
 - the deviance is $D(\theta) = -2log(p(y|\theta)) + C$, where y are the data, $\theta$ are unknown parameters of the model and C is a constant.
 
 Lower is the DIC value better is the accuracy of the model, in this case is better the first model.
+
+I decided to insert also other criterions similar to the DIC, we will see in details what they represent.
+
+$$~$$
+
+## <a id="aic"> Akaike Information Criterion </a>
+
+$$~$$
+
+The Akaike information criterion (AIC) is an estimator of prediction error and thereby relative quality of statistical models for a given set of data. Given a collection of models for the data, AIC estimates the quality of each model, relative to each of the other models. Thus, AIC provides a means for model selection.
+
+In estimating the amount of information lost by a model, AIC deals with the trade-off between the goodness of fit of the model and the simplicity of the model. In other words, AIC deals with both the risk of overfitting and the risk of underfitting.
+
+The Akaike information criterion is defined as 
+
+$$
+AIC(m) = D(\hat{\theta_m}, m) + 2 \cdot d_m
+$$
+
+It is also a penalized deviance measure with penalty equal to 2 for each 
+estimated parameter. $d_m$ is the number of parameters considered in the model m.
+
+In our case comparing the two models we have these values of AIC:
+
+```{r echo=FALSE}
+deviance_m1 <- mod.fit$BUGSoutput$summary["deviance", "mean"]
+deviance_m2 <- mod.fit2$BUGSoutput$summary["deviance", "mean"]
+
+aic_m1 <- deviance_m1 + 2*(length(mod.fit$BUGSoutput$summary[, "mean"])-1)
+aic_m2 <- deviance_m2 + 2*(length(mod.fit2$BUGSoutput$summary[, "mean"])-1)
+
+cat(paste("The AIC for the FIRST model is: ", aic_m1, "\n", sep=""))
+cat(paste("The AIC for the SECOND model is: ", aic_m2, sep=""))
+```
+
+$$~$$
+
+## <a id="bic"> Bayesian Information Criterion </a>
+
+$$~$$
+
+the Bayesian information criterion (BIC) is a criterion for model selection among a finite set of models; the model with the lowest BIC is preferred. It is based, in part, on the likelihood function and it is closely related to the Akaike information criterion (AIC).
+
+When fitting models, it is possible to increase the likelihood by adding parameters, but doing so may result in overfitting. BIC introduces a penalty term for the number of parameters in the model; the penalty term is larger in BIC than in AIC.
+
+The Bayesian information criterion is defined as 
+
+$$
+BIC(m) = D(\hat{\theta_m}, m) + log(n) \cdot d_m
+$$
+
+Where:
+- n is the number of observations considered 
+- $d_m$ is the number of coefficients considered. 
+- $D(\hat{\theta_m}, m)$ is the deviance of the model
+
+In our case comparing the two models we have these values of AIC:
+
+```{r echo=FALSE}
+bic_m1 <- deviance_m1 + log(N)*(length(mod.fit$BUGSoutput$summary[, "mean"])-1)
+bic_m2 <- deviance_m2 + log(N)*(length(mod.fit2$BUGSoutput$summary[, "mean"])-1)
+
+cat(paste("The BIC for the FIRST model is: ", bic_m1, "\n", sep=""))
+cat(paste("The BIC for the SECOND model is: ", bic_m2, sep=""))
+```
+
+$$~$$
+
+## <a id="comparedallcriteria"> Comparing DIC, AIC, BIC </a>
+
+$$~$$
+
+Here we considered all the criterions together:
+
+```{r echo=FALSE}
+data.frame("DIC" = c(mod.fit$BUGSoutput$DIC, mod.fit2$BUGSoutput$DIC),
+           "AIC" = c(aic_m1, aic_m2),
+           "BIC" = c(bic_m1, bic_m2))
+```
+
+As we can see, the values are pretty similar. They are only used as indicator to see how much is better the model with our data.
 
 $$~$$
 
@@ -1397,17 +1471,7 @@ $$~$$
 ## <a id="simulatedata"> Simulation for parameters recovery </a>
 
 $$~$$
-Now, we understood that the first model is better than the second. So, for checking that the model proposed can correctly recover the model parameters. I Executed the simulation considering the data simulated from the model proposed, the beta parameters checked are the estimated from the first model:
-
-- $\beta_2 \rightarrow -1.65$
-- $\beta_3 \rightarrow 0.88$
-- $\beta_4 \rightarrow -0.01$
-- $\beta_8 \rightarrow 0.03$
-- $\beta_9 \rightarrow -0.88$
-- $\beta_{10} \rightarrow -0.48$
-- $\beta_{11} \rightarrow 0.68$
-- $\beta_{12} \rightarrow -0.84$
-- $\beta_{13} \rightarrow -0.85$
+Now, we understood that the first model is better than the second. So, for checking that the model proposed can correctly recover the model parameters. I Executed the simulation considering the data simulated from the model proposed, the beta parameters checked are the estimated from the first model, considering these values we can continue with our last purpose:
 
 ```{r echo=FALSE}
 # Simulate data ------
@@ -1416,17 +1480,18 @@ Now, we understood that the first model is better than the second. So, for check
 N <- 302
 
 # Pick fixed values for the parameters of the model
-beta_2 <- -1.65
-beta_3 <- 0.88
-beta_4 <- -0.01
-beta_8 <- 0.03
-beta_9 <- -0.88
-beta_10 <- -0.48
-beta_11 <- 0.68
-beta_12 <- -0.84
-beta_13 <- -0.85
+beta_2 <- mod.fit$BUGSoutput$summary["beta2","mean"] # rnorm(1, mean = -1, sd = 0.000001) 
+beta_3 <- mod.fit$BUGSoutput$summary["beta3","mean"] # rnorm(1, mean = 0.5, sd = 0.000001) 
+beta_4 <- mod.fit$BUGSoutput$summary["beta4","mean"] # rnorm(1, mean = 0, sd = 0.000001) 
+beta_8 <- mod.fit$BUGSoutput$summary["beta8","mean"] # rnorm(1, mean = 0, sd = 0.000001) 
+beta_9 <- mod.fit$BUGSoutput$summary["beta9","mean"] # rnorm(1, mean = -0.5, sd = 0.000001) 
+beta_10 <- mod.fit$BUGSoutput$summary["beta10","mean"] # rnorm(1, mean = 0.5, sd = 0.000001) 
+beta_11 <- mod.fit$BUGSoutput$summary["beta11","mean"] # rnorm(1, mean = 0.5, sd = 0.000001) 
+beta_12 <- mod.fit$BUGSoutput$summary["beta12","mean"] # rnorm(1, mean = -0.5, sd = 0.000001) 
+beta_13 <- mod.fit$BUGSoutput$summary["beta13","mean"] # rnorm(1, mean = -0.5, sd = 0.000001) 
 
-# Simulate the independent variables
+# Simulate the independent variables - TRY WITH THE SAME DATA X2, X3...
+set.seed(123)
 sim_dat <- data.frame("sim_x2" = rbinom(N, 0:1, prob = mean(x2)),
                       "sim_x3" = rbinom(N, 0:3, prob = mean(x3)),
                       "sim_x4" = round(rnorm(N, mean = mean(x4), sd = sd(x4))),
@@ -1443,7 +1508,9 @@ linpred <- beta_2*sim_dat$sim_x2 + beta_3*sim_dat$sim_x3 + beta_4*sim_dat$sim_x4
 
 pis <- 1/(1+exp(-linpred))
 
-r <- rbinom(N, 0:1, prob = pis)
+r <- sapply(pis, function(x){
+  rbinom(1,1,x)
+})
 
 sim_dat$output <- r
 
@@ -1458,17 +1525,24 @@ sim_data.jags <- list("y" = sim_dat$output, "N" = N,
                   "x13" = sim_dat$sim_x13)
 
 # Run JAGS
-set.seed(123)
 n.chains <- 3
+set.seed(123)
 mod.fit_sim <- jags(data = sim_data.jags,                                                 # DATA
-                model.file = model,                                               # MODEL
-                parameters.to.save = mod.params,                                  # TRACKING
-                n.chains = n.chains, n.iter = 10000, n.burnin = 1000, n.thin=10)  # MCMC
+                model.file = model,                                                       # MODEL
+                parameters.to.save = mod.params,                                          # TRACKING
+                n.chains = n.chains, n.iter = 10000, n.burnin = 1000)  #n.thin = 10       # MCMC 
 
 mod.fit_sim
 ```
 
-The values are slighlty the same, so the parameters chose are perfectly good!
+The values are slighlty the same, so the parameters are recovered partially well, as we can see above:
+
+```{r echo=FALSE}
+comparison <- rbind(mod.fit$BUGSoutput$summary[, "mean"], mod.fit_sim$BUGSoutput$summary[, "mean"])
+rownames(comparison) <- c("Estimated", "True")
+comparison
+```
+
 
 $$~$$
 
@@ -1478,7 +1552,7 @@ $$~$$
 
 We saw the power and the weakness of Bayesian Analysis. 
 
-At first step we tried to face with the model on jags "cheating" a little bit on which parameters are maybe good for our purposes and after that we make our usual considerations, then we compared with another model not so much good, Of curse many little things could be improved in the future in this amazing analysis that I did in my opinion.
+At first step we tried to face with the model on jags "cheating" a little bit on which independent variables are maybe good for our purposes and after that we make our usual considerations, then we compared with another model not so much good.. of course many little things could be improved in the future in this amazing analysis that I did in my opinion.
 
 So thanks for all!
 
