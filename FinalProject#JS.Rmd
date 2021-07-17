@@ -8,8 +8,8 @@ $$~$$
 
 <center> Author $\rightarrow$ Jeremy Sapienza 1960498 </center>
 
-<center> <i> Statitics for Data Science and Laboratory II </i> </center>
-<center> <b> "La Sapienza" University of Rome</b> </center>
+<center> <i> Statistics for Data Science and Laboratory II </i> </center>
+<center> <b> Sapienza University of Rome</b> </center>
 <center> July 21th 2021 </center>
 
 $$~$$ 
@@ -76,35 +76,36 @@ $$~$$
 - <a href="#intro"> The Introduction </a>
     + <a href="#thedataset"> The Dataset </a> 
     + <a href="#dvs"> The Data Visualization </a>
-        + <a href="#pca"> The visualization using PCA </a>
+        + <a href="#pca"> The Visualization Using PCA </a>
         + <a href="#tcd"> The Categorical Data </a>
         + <a href="#tqd"> The Quantitative Data </a>
         + <a href="#tc"> The Correlations </a>
-- <a href="#pbd"> Preliminary brief definitions </a>
-- <a href="#thegoal"> The Goal (+ Cheating and using the Frequentistic Logistic Regression Approach) </a>
-    + <a href="#tfm"> The First Model (link function with logit) </a>
+- <a href="#pbd"> Preliminary Brief Definitions </a>
+- <a href="#thegoal"> The Goal (+ Cheating And Using The Frequentistic Logistic Regression Approach) </a>
+    + <a href="#tfm"> The First Model (Link Function With logit) </a>
         + <a href="#ir"> Implementing RJags </a>
-        + <a href="#tsr"> The stationary regions </a>
-        + <a href="#soip"> Some other interesting plots </a>
+        + <a href="#tsr"> The Stationary Regions </a>
+        + <a href="#soip"> Some Other Interesting Plots </a>
         + <a href="#tcm"> The Cumulative Means </a>
         + <a href="#tae"> The Approximation Error </a>
-        + <a href="#pu"> Posterior uncertainty </a>
+        + <a href="#pu"> Posterior Uncertainty </a>
         + <a href="#tcest"> The Estimated Correlations </a>
-    + <a href="#htmc"> Hypotheses and Testing of the convergences of these multiple Markov chains </a>
+    + <a href="#htmc"> Hypotheses And Testing Of The Convergences Of These Multiple Markov Chains </a>
         + <a href="#raftery"> Raftery & Lewis Test </a>
         + <a href="#geweke"> Geweke Test </a>
         + <a href="#gelman"> Gelman Test </a>
         + <a href="#ht"> Heidel Test </a>
-    + <a href="#cia"> Credible interval and the point estimates </a>
+    + <a href="#cia"> Credible Interval And The Point Estimates </a>
     + <a href="#tp"> The Predictions </a>
 - <a href="#tsm"> The Second Model </a>
-    + <a href="#dic"> The comparison between these two models (DIC) </a>
+    + <a href="#dic"> The Comparison Between These Two Models (DIC) </a>
         + <a href="#aic"> Akaike Information Criterion (AIC) </a>
         + <a href="#bic"> Bayesian Information Criterion (BIC) </a>
         + <a href="#comparedallcriteria"> Comparing DIC, AIC, BIC </a>
 - <a href="#conclusions"> The Conclusions </a>
-    + <a href="#simulatedata"> Simulation for parameters recovery </a>
+    + <a href="#simulatedata"> Parameters Recovery Simulations </a>
     + <a href="#finalconclusions"> ...Final Conclusions </a>
+    + <a href="#furtherwork"> Further Work </a>
     + <a href="#thereferences"> The References </a>
 
 $$~$$
@@ -139,7 +140,7 @@ head(dat)
 
 $$~$$
 
-Analyzing these features, I recognized that the:
+Analyzing these features, we captured some interesting information for each feature within the dataset:
 
 <style>
 ol ul {
@@ -169,7 +170,7 @@ ol ul {
 9. ***exng*** -> it refers to the exercise induced angina that could be:
     + 1 (yes)
     + 0 (no)
-10. ***oldpeak*** -> it refers to the Previous peak
+10. ***oldpeak*** -> it refers to the previous peak
 11. ***slp*** -> it refers to the peak exercise ST segment: 
     + 0 as up sloping
     + 1 as flat
@@ -184,7 +185,9 @@ ol ul {
 
 $$~$$
 
-The main features detected are: 
+As we can see above, we have qualitative and quantitative data that will be well explained in the next subchapters.
+
+The main features detected have these summaries: 
 
 $$~$$
 
@@ -195,11 +198,11 @@ summary(dat)
 $$~$$
 As we can see above: 
 
-- the people captured in this datasets represent people between 29 and 77 years, so is evident that there isn't any teenager in this dataset. Because, there is a low probability that the teenagers have the heart attack in their young ages.
-- the genders in this dataset are equally distributed between females and males.
-- for the output features, we observed that there is again an equally distribution between people that have heart attack and not.
+1. The people captured in this dataset represents ***people between 29 and 77 years***, so it is evident that there aren't teenagers in this dataset. Because, there is a low probability that the teenagers have the heart attack.
+2. The ***genders*** in this dataset are ***equally distributed*** between females and males.
+3. The ***output*** feature is ***equally distributed*** between people that have a heart attack and not.
 
-Other features of this dataset could be easily see in this summary, so let's go to the data visualization for having a good visualizations of which data we are treating!
+...Behaviours of the other features within the dataset could be seen in this summary, so let's go to the data visualization for having a good visualizations of which data we are treating!
 
 $$~$$
 
@@ -207,15 +210,15 @@ $$~$$
 
 $$~$$
 
-In this subsection we want to describe graphically the dataset that we are analyzing to have a first taste of what is the better model to use in this case, we want to show below some interesting plots:
+In this subsection we want to describe graphically the dataset that we are analyzing to have a first taste of what is the better model to use in this case, we want to show below some interesting plots.
 
 $$~$$
 
-### <a id="pca"> The visualization using PCA </a>
+### <a id="pca"> The Visualization Using PCA </a>
 
 $$~$$
 
-PCA is a particular tool that allows us to show the behaviour of the patients (treated as points in this space) of our data. We see in this way which are the patients more similar to each other
+PCA is a particular (visualization, sometimes) tool that allows us to show the patients similar each other. Essentially, the principal component analysis (PCA) is the process of computing the principal components and using them to perform a change of basis on the data, sometimes using only the first few principal components and ignoring the rest. Also PCA is used in exploratory data analysis and for making predictive models. It is commonly used for dimensionality reduction by projecting each data point onto only the first few principal components to obtain lower-dimensional data while preserving as much of the data's variation as possible.
 
 $$~$$
 
@@ -236,7 +239,7 @@ fviz_eig(res.pca) # Show the percentage of variances explained by each principal
 
 $$~$$
 
-Its normal to denote that there could be some losses on this representation due to the amount of features that we want to consider, but here we actually recover ***89.8%*** of variance in the entire dataset using two principal components, so this is a good result. 
+Its normal to denote that there could be some losses on this representation due to the amount of features that we want to consider, but here we actually recover ***89.8%*** of variance in the entire dataset using two principal components, so this is a good preservation of the result. 
 
 $$~$$
 
@@ -297,7 +300,9 @@ cp_dat %>%
                             depth= 45))
 ```
 
-The most relevant is the ***typical angina (47.4%)*** that is defined as substernal chest pain precipitated by physical exertion or emotional stress and relieved with rest or nitroglycerin (represents inadequate flow of blood and oxygen to the heart). Women and elderly patients are usually have atypical symptoms both at rest and during stress, often in the setting of nonobstructive coronary artery disease (CAD).
+The most relevant is the ***typical angina (47.4%)*** that is defined as substernal chest pain precipitated by physical exertion or emotional stress and relieved with rest or nitroglycerin (represents a particular decrease of flow of the blood and oxygen to the heart, in order to relax the patient. This allows to pass well the blood within the body's patient). 
+
+Women and elderly patients are usually have atypical symptoms both at rest and during stress, often in the setting of nonobstructive coronary artery disease (CAD).
 
 $$~$$
  
@@ -402,7 +407,11 @@ slp_dat %>%
     
 ```
 
-the ST/heart rate slope (ST/HR slope), has been proposed as a more accurate ECG criterion for diagnosing significant coronary artery disease (CAD). The most relevant rate slope is approximately between the first and second type (as flat and as down sloping). 
+![](./img/heartrateslope.JPG){width=25%; align=RIGHT}
+
+the ST/heart rate slope (ST/HR slope), is proposed as a more accurate ECG criterion for diagnosing significant coronary artery disease (CAD).
+
+The most relevant rate slope is approximately between the first and second type (as ***flat*** and as ***down sloping***) these are qualitative data that show how it is the type of heart rate frequence. 
 
 $$~$$
 
@@ -424,7 +433,7 @@ caa_dat %>%
 
 ```
 
-The most case is about 0 major vessels that aren't affect of any damaged, but in other little case we see that there are a bunch of major vessels that have a problem, within the heart.
+The most case is 0 major vessels interested, this means that they aren't effect of any damaged. In other little case we can see that few vessels are damaged (around 1-2 vessels).
 
 $$~$$
 
@@ -491,7 +500,9 @@ exng_dat %>%
 
 ```
 
-Angina may feel like pressure in the chest, jaw or arm. It frequently may occur with exercise or stress. Some people with angina also report feeling lightheaded, overly tired, short of breath or nauseated. As the heart pumps harder to keep up with what you are doing, it needs more oxygen-rich blood. This reflects to the fact that we have no exercise induced by angina.
+Angina may feel like pressure in the chest, jaw or arm. It frequently may occur with exercise or stress. Some people with angina also report feeling lightheaded, overly tired, short of breath or nauseated. 
+
+As the heart pumps harder to keep up with what you are doing, it needs more oxygen-rich blood. This reflects to the fact that we have no exercise induced by angina.
 
 $$~$$
 
@@ -587,7 +598,7 @@ $$~$$
 
 $$~$$
 
-Here, we illustrate the main features of the quantitative data, after have seen the categorical data in the previous section:
+Here, we illustrate the main features of the quantitative data after have seen the categorical data in the previous section:
 
 $$~$$
 
@@ -600,7 +611,8 @@ hist.and.summary('oldpeak', 'Previous Peak')
 ```
 
 $$~$$
-As we can see above, the distribution of these data are different and several are more similar, for example if you compare the maximum heart rate and the age of the people these distributions are different! So, these considerations could be useful for predicting the heart attack.
+
+As we can see above, the distributions of these data are different and several are more similar, for example if you compare the maximum heart rate and the age of the people these distributions are different! So, these considerations could be useful for predicting the heart attack.
 
 After this, we consider also the densities considering the case of having the heart attack and not:
 
@@ -624,15 +636,47 @@ Here, we want to highlight the correlations between the features treated in qual
 $$~$$
 
 ```{r echo=FALSE}
-hchart(cor(dat[, c("sex", "cp", "fbs", "restecg", "exng", "slp", "caa", "thall")]), color = randomcoloR::randomColor()) %>%
+hchart(round(cor(dat[, c("sex", "cp", "fbs", "restecg", "exng", "slp", "caa", "thall")], method = "pearson"), digits = 2), color = randomcoloR::randomColor()) %>%
+  hc_plotOptions(
+             series = list(
+                borderColor = "#fcfbfa",
+                borderWidth = 1,
+                animation=(durtion=1000),
+                dataLabels = list(enabled = TRUE)
+  )) %>%
   hc_title(text = "Correlations between qualitative variables") # considering only the qualitative data
 
-hchart(cor(dat[, c("age", "chol", "thalachh", "trtbps", "oldpeak")]), color = randomcoloR::randomColor()) %>%
+hchart(round(cor(dat[, c("age", "chol", "thalachh", "trtbps", "oldpeak")], method = "pearson"), digits = 2), color = randomcoloR::randomColor()) %>%
+  hc_plotOptions(
+             series = list(
+                borderColor = "#fcfbfa",
+                borderWidth = 1,
+                animation=(durtion=1000),
+                dataLabels = list(enabled = TRUE)
+  )) %>%
   hc_title(text = "Correlations between quantitative variables") # considering only the quantitative data
 
-hchart(cor(dat[, c(1:13)]), color = randomcoloR::randomColor()) %>%
+hchart(round(cor(dat[, c(1:13)], method = "pearson"), digits = 2), color = randomcoloR::randomColor()) %>%
+  hc_plotOptions(
+             series = list(
+                borderColor = "#fcfbfa",
+                borderWidth = 1,
+                animation=(durtion=1000),
+                dataLabels = list(enabled = TRUE)
+  )) %>%
   hc_title(text = "Correlations between all independent variables") # considering only the whole data
 ```
+
+The correlations are measured considering the Pearson formula: 
+
+$$
+\rho_{XY} = \frac{Cov(X,Y)}{\sigma_X \cdot \sigma_Y}
+$$
+Where:
+
+- $Cov(X,Y)$ is the covariance between the two sets of values X and Y
+- $\sigma_X$ is the deviation standard of the set X
+- $\sigma_Y$ is the deviation standard of the set Y
 
 With these correlation maps we see some interesting correlations is important to denote that the quantitative variables are more significant than the qualitative variables, because we are treating the quantitative measures, but here we can highlight and consider also the qualitative variables. So, here we denote in the complete map that the:
 
@@ -641,29 +685,29 @@ With these correlation maps we see some interesting correlations is important to
 - thalachh and exng $\rightarrow$ have ***-0.38*** of correlations
 - slp and oldpeak $\rightarrow$ have ***-0.58*** of correlations
 
-seems that these variables will be important in our predictions later, we will see in few moment if it is in this way!
+seems that these variables will be important in our predictions, we will see in few moment if it is in this way!
 
 $$~$$
 
-# <a id="pbd"> Preliminary brief definitions </a>
+# <a id="pbd"> Preliminary Brief Definitions </a>
 
 $$~$$
 
 - ***Likelihood $\pi(y_{obs}|\theta)$:*** measures the goodness of fit of a statistical model to ***a sample of data for giving values of the unknown parameters***. It is formed from the joint probability distribution of the sample, but viewed and used as a function of the parameters only, thus treating the random variables as fixed at the observed values.
 
-- ***Logistic regression model:*** Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables.
+- ***Logistic regression model:*** Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables. This is more faster than other binary classificators.
 
-- ***logit link function:*** it uses the Cumulative Distribution Function (CDF) of the logistic distribution. A benefit to using Logit is that the coefficients can be interpreted in the terms of odds ratios.
+- ***logit link function:*** it uses the Cumulative Distribution Function (CDF) of the logistic distribution. A benefit to use the Logit is that the coefficients can be interpreted in the terms of odds ratios.
 
 - ***cloglog function:*** Is unlike Logit and Probit asymmetric. It is best used when the probability of an event is very small or very large.  The complementary log-log approaches 0 infinitely slower than any other link function. Cloglog model is closely related to continuous-time models for the occurrence of events, so it has an important application in the area of survival analysis and hazard modeling.
 
 - ***Prior $\pi(\theta)$:*** is the probability distribution that would ***express one's beliefs*** about this quantity ***before some evidence is taken into account***.
 
-- ***the deviance:*** is a goodness-of-fit statistic for a statistical model; it is often used for statistical hypothesis testing. It is a generalization of the idea of using the sum of squares of residuals (RSS) in ordinary least squares to cases where model-fitting is achieved by maximum likelihood.
+- ***the deviance:*** is a goodness of fit statistic for a statistical model; it is often used for statistical hypothesis testing. It is a generalization of the idea of using the sum of squares of residuals (RSS) in ordinary least squares to cases where model-fitting is achieved by maximum likelihood.
 
 $$~$$
 
-# <a id="thegoal"> The Goal (+ Cheating and using the Frequentistic Logistic Regression Approach) </a>
+# <a id="thegoal"> The Goal (+ Cheating And Using The Frequentistic Logistic Regression Approach) </a>
 
 $$~$$
 
@@ -674,6 +718,11 @@ So, the response variable $Y_i$ (that is the "output" feature in our dataset) is
 $$~$$
 
 ```{r echo=FALSE}
+idxtr<-sample(1:nrow(dat),0.8*nrow(dat)) #sampling indices from the main dataset
+
+dat_test <- dat[-idxtr, ]
+dat <- dat[idxtr, ]
+
 # Preparing data for JAGS
 N <- nrow(dat) # number of obs
 
@@ -681,19 +730,19 @@ N <- nrow(dat) # number of obs
 y <- as.vector(dat$output) # Target variable, risks heart attack?
 
 # Independent Variables
-x1 <- as.vector(dat$age) # Age
+x1 <- as.vector(scale(as.vector(dat$age))) # Age
 x2 <- as.vector(dat$sex) # Sex
-x3 <- as.vector(dat$cp) # Chest Pain Type: 1) Typical Angina 2) Atypical Angina 3) Non-Anginal Pain 4) Asymptomatic
-x4 <- as.vector(dat$trtbps) # resting blood pressure (in mm Hg)
-x5 <- as.vector(dat$chol) # cholestoral in mg/dl fetched via BMI sensor
+x3 <- as.vector(scale(as.vector(dat$cp))) # Chest Pain Type: 1) Typical Angina 2) Atypical Angina 3) Non-Anginal Pain 4) Asymptomatic
+x4 <- as.vector(scale(as.vector(dat$trtbps))) # resting blood pressure (in mm Hg)
+x5 <- as.vector(scale(as.vector(dat$chol))) # cholestoral in mg/dl fetched via BMI sensor
 x6 <- as.vector(dat$fbs) # (fasting blood sugar > 120 mg/dl) (1 = true; 0 = false)
-x7 <- as.vector(dat$restecg) # resting electrocardiographic results 0) Normal 1) having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV) 2) showing probable or definite left ventricular hypertrophy by Estes' criteria 
-x8 <- as.vector(dat$thalachh) # maximum heart rate achieved
+x7 <- as.vector(scale(as.vector(dat$restecg))) # resting electrocardiographic results 0) Normal 1) having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV) 2) showing probable or definite left ventricular hypertrophy by Estes' criteria 
+x8 <- as.vector(scale(as.vector(dat$thalachh))) # maximum heart rate achieved
 x9 <- as.vector(dat$exng) # exercise induced angina (1 = yes; 0 = no)
-x10 <- as.vector(dat$oldpeak) # Previous peak
-x11 <- as.vector(dat$slp) # Slope
-x12 <- as.vector(dat$caa) # number of major vessels (0-3)
-x13 <- as.vector(dat$thall) # Thal rate
+x10 <- as.vector(scale(as.vector(dat$oldpeak))) # Previous peak
+x11 <- as.vector(scale(as.vector(dat$slp))) # Slope
+x12 <- as.vector(scale(as.vector(dat$caa))) # number of major vessels (0-3)
+x13 <- as.vector(scale(as.vector(dat$thall))) # Thal rate
 
 summary(glm(y ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11+x12+x13, family = binomial(link = "logit"),data=dat))
 ```
@@ -714,7 +763,8 @@ An important remark to highlight is that we tried to do the frequentist approach
 But, if we try with the features that we decide to consider in the next steps?
 
 ```{r echo="FALSE"}
-summary(glm(y ~ x2+x3+x4+x8+x9+x10+x11+x12+x13, family = binomial(link = "logit"),data=dat))
+summary(glm(y ~ x2+x3+x4+x7+x9+x10+x12+x13, family = binomial(link = "logit"),data=dat))
+dat_test <- dat_test[, -c(1,5,6,8,11)]
 ```
 
 The behaviour is slightly changed, we have 234.19 as AIC value, we will see if we achieve the same result!
@@ -723,7 +773,7 @@ Then, in summary we have N = 302 observations and we considered these features a
 
 $$~$$
 
-# <a id="tfm"> The First Model (link function with logit) </a>
+# <a id="tfm"> The First Model (Link Function With Logit) </a>
 
 $$~$$
 
@@ -731,12 +781,12 @@ In the first model, we decide to consider the following logistic regression mode
 
 $$
 Y_i \sim Bern(logit(p_i)) \\
-logit(p_i) = \beta_{2} \cdot x_{2_i} + \beta_{3} \cdot x_{3_i} + \beta_{4} \cdot x_{4_i} +\beta_{8} \cdot x_{8_i} + \beta_{9} \cdot x_{9_i} + \beta_{10} \cdot x_{10_i} + \beta_{11} \cdot x_{11_i} + \beta_{12} \cdot x_{12_i} + \beta_{13} \cdot x_{13_i}
+logit(p_i) =  log\Big(\frac{p_i}{1-p_i}\Big)= \beta_{2} \cdot x_{2_i} + \beta_{3} \cdot x_{3_i} + \beta_{4} \cdot x_{4_i} +\beta_{8} \cdot x_{8_i} + \beta_{9} \cdot x_{9_i} + \beta_{10} \cdot x_{10_i} + \beta_{11} \cdot x_{11_i} + \beta_{12} \cdot x_{12_i} + \beta_{13} \cdot x_{13_i}
 $$
 The prior beta parameters are chosen approximatly considering the estimated averages saw in the previous subsection regarding the outcomes of glm(). So, the beta prior parameters are distributed following a normal distribution as follows:
 
 $$
-\beta_i \sim N(\mu = 0, \tau^2 = 1.0^{-6})  \,\,\, for \,\, i \,\, = 2,3,4,8,9,..,13
+\beta_i \sim N(\mu = 0, \tau^2 = 0.000001)  \,\,\, for \,\, i \,\, = 2,3,4,8,9,..,13
 $$
 
 The main reason is that we prefer chosing the binary classification as in this case the logistic regression to model our outcomes based only on 0 or 1.
@@ -760,17 +810,17 @@ model <- function(){
   # Likelihood
   for (i in 1:N){
     y[i] ~ dbern(p[i])
-    logit(p[i]) <-  beta2*x2[i] + beta3*x3[i] + beta4*x4[i] + beta8*x8[i] + beta9*x9[i] + beta10*x10[i] + beta11*x11[i] + beta12*x12[i] + beta13*x13[i] # omit intercept and not useful variables
+    logit(p[i]) <-  beta0 + beta2*x2[i] + beta3*x3[i] + beta4*x4[i] + beta7*x7[i] + beta9*x9[i] + beta10*x10[i] + beta12*x12[i] + beta13*x13[i] # omit intercept and not useful variables
   }
   
   # Defining the prior beta parameters
+  beta0 ~ dnorm(0, 1.0E-6)
   beta2 ~ dnorm(0, 1.0E-6)
   beta3 ~ dnorm(0, 1.0E-6)
   beta4 ~ dnorm(0, 1.0E-6)
-  beta8 ~ dnorm(0, 1.0E-6)
+  beta7 ~ dnorm(0, 1.0E-6)
   beta9 ~ dnorm(0, 1.0E-6)
   beta10 ~ dnorm(0, 1.0E-6)
-  beta11 ~ dnorm(0, 1.0E-6)
   beta12 ~ dnorm(0, 1.0E-6)
   beta13 ~ dnorm(0, 1.0E-6)
 }
@@ -785,10 +835,10 @@ $$~$$
 ```{r}
 # Passing the data for RJags
 data.jags <- list("y" = y, "N" = N,
-                  "x2" = x2, "x3" = x3, "x4" = x4, "x8" = x8, "x9" = x9, "x10" = x10, "x11" = x11, "x12" = x12, "x13" = x13)
+                  "x2" = x2, "x3" = x3, "x4" = x4, "x7" = x7, "x9" = x9, "x10" = x10, "x12" = x12, "x13" = x13)
 
 # Defining parameters of interest to show after running RJags
-mod.params <- c("beta2", "beta3", "beta4", "beta8", "beta9", "beta10", "beta11", "beta12", "beta13")
+mod.params <- c("beta0", "beta2", "beta3", "beta4", "beta7", "beta9", "beta10", "beta12", "beta13")
 ```
 
 $$~$$
@@ -799,10 +849,10 @@ $$~$$
 # Run JAGS
 set.seed(123)
 n.chains <- 3
-mod.fit <- jags(data = data.jags,                                                 # DATA
-                model.file = model,                                               # MODEL
-                parameters.to.save = mod.params,                                  # TRACKING
-                n.chains = n.chains, n.iter = 10000, n.burnin = 1000)  # MCMC
+mod.fit <- jags(data = data.jags,                                                   # DATA
+                model.file = model,                                                 # MODEL
+                parameters.to.save = mod.params,                                    # TRACKING
+                n.chains = n.chains, n.iter = 10000, n.burnin = 1000, n.thin = 10)  # MCMC
 
 mod.fit
 ```
@@ -821,7 +871,7 @@ In this last running of the MCMC we have interesting results:
 
 $$~$$
 
-### <a id="tsr"> The stationary regions </a>
+### <a id="tsr"> The Stationary Regions </a>
 
 $$~$$
 
@@ -834,7 +884,7 @@ traceplot(mod.fit)
 
 $$~$$
 
-### <a id="soip"> Some other interesting plots </a>
+### <a id="soip"> Some Other Interesting Plots </a>
 
 $$~$$
 
@@ -846,8 +896,8 @@ chainArray <- mod.fit$BUGSoutput$sims.array
 
 # considering to split each couples of parameters
 bayesplot::mcmc_combo(chainArray, pars = c("deviance", "beta2", "beta3"))
-bayesplot::mcmc_combo(chainArray, pars = c("beta4", "beta8", "beta9", "beta10"))
-bayesplot::mcmc_combo(chainArray, pars = c("beta11", "beta12", "beta13"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta4", "beta7", "beta9"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta10", "beta12", "beta13"))
 ```
 
 $$~$$
@@ -863,7 +913,7 @@ autocorr.diag(as.mcmc(mod.fit))
 
 $$~$$
 
-The ACFs follow good behaviours, because we need to have samples independent each other during new iterations. Here, we see that the correlations are going further from the first lag, this is strictly decreasing. So, this is a good point!
+The ACFs follow good behaviours, because we need to have samples independent each other during new iterations. Here, we see that the correlations are going further from the first lag, this is strictly decreasing going close to 0. So, this is a good point!
 
 We can conferm our intuition also with the values returned by autocorr.diag() that it returned the vector of the average autocorrelations across all chains.
 
@@ -888,12 +938,12 @@ $$~$$
 
 ```{r echo=FALSE}
 df <- as.data.frame(mod.fit$BUGSoutput$sims.array)
-  
+
 df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 1])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 2]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 3]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta10") %>%
+        hc_title(text = "The Empirical Mean of beta0") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -901,7 +951,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 4])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 5]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 6]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta11") %>%
+        hc_title(text = "The Empirical Mean of beta10") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -922,18 +972,10 @@ df %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
 df %>%
-  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 10])), color = "red", name = "First Chain") %>%
-    hc_add_series( cummean(df[, 11]), type = "line", color = "blue", name = "Second Chain") %>%
-      hc_add_series( cummean(df[, 12]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta2") %>%
-          hc_xAxis(title = list(text = "Iteration")) %>%
-            hc_yAxis(title = list(text = 'Cumulative Mean'))
-
-df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 13])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 14]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 15]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta3") %>%
+        hc_title(text = "The Empirical Mean of beta2") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -941,7 +983,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 16])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 17]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 18]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta4") %>%
+        hc_title(text = "The Empirical Mean of beta3") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -949,7 +991,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 19])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 20]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 21]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta8") %>%
+        hc_title(text = "The Empirical Mean of beta4") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -957,7 +999,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 22])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 23]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 24]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta9") %>%
+        hc_title(text = "The Empirical Mean of beta7") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -965,10 +1007,20 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 25])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 26]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 27]), type = "line", color = "green", name = "Thrid Chain") %>%
+        hc_title(text = "The Empirical Mean of beta9") %>%
+          hc_xAxis(title = list(text = "Iteration")) %>%
+            hc_yAxis(title = list(text = 'Cumulative Mean'))
+
+df %>%
+  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 28])), color = "red", name = "First Chain") %>%
+    hc_add_series( cummean(df[, 29]), type = "line", color = "blue", name = "Second Chain") %>%
+      hc_add_series( cummean(df[, 30]), type = "line", color = "green", name = "Thrid Chain") %>%
         hc_title(text = "The Empirical Mean of deviance") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 ```
+
+As we can see above each parameter achieves in all of the three chains generated the same end point, so means that with different initial points in these three chains, we are strictly going to have the same estimated mean parameter at the end.
 
 $$~$$
 
@@ -1024,7 +1076,7 @@ As we can see the $\beta_2$ has the highest uncertainty considering the jointly 
 
 $$~$$
 
-### <a id="pu"> Posterior uncertainty </a>
+### <a id="pu"> Posterior Uncertainty </a>
 
 $$~$$
 
@@ -1049,7 +1101,14 @@ $$~$$
 Here, we bring the correlations between all the values calculated during the MCMC sampling, considering the joining matrix:
 
 ```{r echo=FALSE}
-hchart(cor(mod.fit$BUGSoutput$sims.matrix)) %>%
+hchart(round(cor(mod.fit$BUGSoutput$sims.matrix), digits = 2)) %>%
+  hc_plotOptions(
+             series = list(
+                borderColor = "#fcfbfa",
+                borderWidth = 1,
+                animation=(durtion=1000),
+                dataLabels = list(enabled = TRUE)
+  )) %>%
   hc_title(text = "Correlations between all the parameters calculated") # considering only the whole data
 ```
 
@@ -1057,11 +1116,11 @@ the highest correlation is between $\beta_4 \text{ and } \beta_8$.
 
 $$~$$
 
-## <a id="htmc"> Hypotheses and Testing of the convergences of these multiple Markov chains </a>
+## <a id="htmc"> Hypotheses And Testing Of The Convergences Of These Multiple Markov Chains </a>
 
 $$~$$
 
-Here, we want to understand if we achieve with these multiple simulations of the markov chains the convergences and the validity. We are considering different tools saw in the last lectures, to understand if we achieve or not the convergency, the tools utilized are:
+Here, we want to understand if we achieve with these multiple simulations of the markov chains the convergences and the validity of the stationarity regions. We are considering different tools saw in the last lectures, to understand if we achieve or not the convergency, the tools utilized are:
 
 - The Raftery & Lewis Diagnostic
 - The Geweke Diagnostic 
@@ -1073,12 +1132,15 @@ $$~$$
 ## <a id="raftery"> Raftery & Lewis Test </a>
 
 $$~$$
-Introduced an MCMC diagnostic that estimates the number of iterations needed for a given level of precision in posterior samples, as well as estimating burn-in, when quantiles are the posterior summaries of interest.
+This Introduces an MCMC diagnostic that estimates the number of iterations needed for a given level of precision in posterior samples, as well as estimating burn-in, when quantiles are the posterior summaries of interest.
 
 ```{r}
 coda::raftery.diag(coda.fit)
 ```
 
+$$~$$
+
+As we can see above, we need 3746 samples to achieve these performances in these different chains.
 
 $$~$$
 
@@ -1115,7 +1177,7 @@ $$~$$
 ## <a id="ht"> Heidel Test </a>
 
 $$~$$
-Implements a convergence diagnostic, and removes up to half the chain in order to ensure that the means are estimated from a chain that has converged.
+This test implements a convergence diagnostic, and removes up to half the chain in order to ensure that the means are estimated from a chain that has converged.
 
 The ***convergence test*** uses the Cramer-von-Mises statistic to test the null hypothesis that the sampled values come from a stationary distribution. 
 
@@ -1135,13 +1197,13 @@ coda::heidel.diag(coda.fit)
 
 $$~$$
 
-We prefer considering the Heidel test because it is a double check of the stationarity and the convergency states. This is sometimes failed, meanwhile the other tools seems to be good, so I prefer considering this test.
+We prefer considering more the Heidel test because it is a double check of the stationarity and the convergency states. This is sometimes failed, meanwhile the other tools seems to be good, so I prefer considering this test.
 
 Here, we can see all is considered correctly, so our intuitions are correct!
 
 $$~$$
 
-## <a id="cia"> Credible interval and the point estimates </a>
+## <a id="cia"> Credible Interval And The Point Estimates </a>
 
 $$~$$
 
@@ -1162,6 +1224,8 @@ cred <- 0.95
 (p.HPD.jags <- coda::HPDinterval(as.mcmc(chainMat)))
 ```
 
+$$~$$
+
 It's relevant to conclude that all your parameters (and its variables) are significant to predict heart attacks (except for $\beta_4$)
 
 $$~$$
@@ -1181,25 +1245,71 @@ where the $\theta$ is equal to the coefficients used and considered before, $\Th
 Here, there is a brief practical example where we predict 302 new random observations:
 
 ```{r}
-new_record <- list(x2 = sample(x2, 1, replace = T), x3 = sample(x3, 1, replace = T), x4 = sample(x4, 1, replace = T), x8 = sample(x8, 1, replace = T), x9 = sample(x9, 1, replace = T),
-                   x10 = sample(x10, 1, replace = T), x11 = sample(x11, 1, replace = T), x12 = sample(x12, 1, replace = T), x13 = sample(x13, 1, replace = T))
+# creating false N observations, trying to predict them (creating a false test set)
+dat_test[c(2,3,4,6,7,8)] <- lapply(dat_test[c(2,3,4,6,7,8)], function(x) c(scale(x))) # scaling for predicting better than before
 
-x <- mod.fit$BUGSoutput$sims.matrix[,"beta2"]*new_record$x2 + mod.fit$BUGSoutput$sims.matrix[,"beta3"]*new_record$x3 + mod.fit$BUGSoutput$sims.matrix[,"beta4"]*new_record$x4 + mod.fit$BUGSoutput$sims.matrix[,"beta8"]*new_record$x8 + mod.fit$BUGSoutput$sims.matrix[,"beta9"]*new_record$x9 + mod.fit$BUGSoutput$sims.matrix[,"beta10"]*new_record$x10 + mod.fit$BUGSoutput$sims.matrix[,"beta11"]*new_record$x11 + mod.fit$BUGSoutput$sims.matrix[,"beta12"]*new_record$x12 + mod.fit$BUGSoutput$sims.matrix[,"beta13"]*new_record$x13	
-x_mu <- 1/(1+exp(-x))
+# Saving the estimated beta parameters
+beta_est <- list("beta0" = mod.fit$BUGSoutput$summary["beta0", "mean"],
+                 "beta2" = mod.fit$BUGSoutput$summary["beta2", "mean"],
+                 "beta3" = mod.fit$BUGSoutput$summary["beta3", "mean"],
+                 "beta4" = mod.fit$BUGSoutput$summary["beta4", "mean"],
+                 "beta7" = mod.fit$BUGSoutput$summary["beta7", "mean"],
+                 "beta9" = mod.fit$BUGSoutput$summary["beta9", "mean"],
+                 "beta10" = mod.fit$BUGSoutput$summary["beta10", "mean"],
+                 "beta12" = mod.fit$BUGSoutput$summary["beta12", "mean"],
+                 "beta13" = mod.fit$BUGSoutput$summary["beta13", "mean"])
 
-y_pred <- unlist(lapply(x_mu, function(x) rbinom(n = 1, size = 1, prob = x)))
-sd(y_pred)
-prop.table(table(y_pred))
-prop.table(table(y))
 
-summary(y_pred)[4]
-hchart(y_pred, type = "column", name = "model1", color = randomcoloR::randomColor()) %>%
-  hc_title(text = "Predictions with model 1") %>%
-  hc_xAxis(title = "model1") %>%
+# Iterating and found each predictive values
+dat_test$output_predictive <- apply(dat_test, 1, function(x){
+  
+  o <- beta_est$beta0 + beta_est$beta2*x["sex"] + beta_est$beta3*x["cp"] + beta_est$beta4*x["trtbps"] + beta_est$beta7*x["restecg"] + beta_est$beta9*x["exng"] + beta_est$beta10*x["oldpeak"] + beta_est$beta12*x["caa"] + beta_est$beta13*x["thall"]
+  
+  o_perc <- 1/(1+exp(-o))
+  
+  y_pred <- rbinom(n = 10000, size = 1, prob = o_perc)
+  
+  # get the most repeated value
+  predicted <- unique(y_pred)
+  predicted <- predicted[which.max(tabulate(match(y_pred, predicted)))]
+  
+  return(predicted)
+})
+
+# Confusion matrix
+conf_mtx <- as.data.frame(round(prop.table(table(dat_test$output, dat_test$output_predictive)), digits = 3))
+
+hchart(conf_mtx, type = "heatmap", hcaes(x = Var1, y = Var2, value = Freq)) %>%
+  hc_title(text = "The Confusion Matrix") %>%
+  hc_plotOptions(
+             series = list(
+                borderColor = "#fcfbfa",
+                borderWidth = 1,
+                animation=(durtion=1000),
+                dataLabels = list(enabled = TRUE)
+  )) %>%
+      hc_xAxis(title=list(text="Actual Values"))  %>%
+         hc_yAxis(title=list(text="Predicted Values") )
+
+# Showing the accuracy and the error together
+info_dt <- data.frame("Accuracy" = mean(dat_test$output == dat_test$output_predictive), "Error" = mean(dat_test$output != dat_test$output_predictive))
+
+highchart() %>% 
+  hc_chart(type = "column") %>%
+  hc_title(text = "The Classificator") %>%
+  hc_plotOptions(column = list(stacking = "normal")) %>%
+  hc_add_series(name="Accuracy of the Model",
+                data = info_dt$Accuracy,
+                stack = "Accuracy") %>%
+  hc_add_series(name="Error of the Model",
+                data = info_dt$Error,
+                stack = "Error") %>%
   hc_chart(options3d=list(enabled=TRUE, alpha=2, beta=-10, 
-                          depth=100, viewDistance=25)) %>% 
+                            depth=100, viewDistance=25)) %>% 
   hc_plotOptions(column=list(depth= 100))
 ```
+
+With this fake predictions we are be able to see something in terms of accuracy of the model, as we can see above!
 
 After read, the whole project report we will see which is the best model here in terms of predictions... stay tuned! 
 
@@ -1261,7 +1371,7 @@ Can you see something different? Seems yes.. see the DIC! Is better the previous
 
 $$~$$
 
-# <a id="dic"> The comparison between these two models (DIC) </a>
+# <a id="dic"> The Comparison Between These Two Models (DIC) </a>
 
 $$~$$
 
@@ -1376,43 +1486,15 @@ $$~$$
 We try to plot the logistic regression using the parameters obtained in the first model, we compare the line for each parameter-response variable:
 
 ```{r echo=FALSE}
-x_logits <- mod.fit$BUGSoutput$summary["beta2","mean"]*x2 + mod.fit$BUGSoutput$summary["beta3","mean"]*x3 + mod.fit$BUGSoutput$summary["beta4","mean"]*x4 + mod.fit$BUGSoutput$summary["beta8","mean"]*x8 + mod.fit$BUGSoutput$summary["beta9","mean"]*x9 + mod.fit$BUGSoutput$summary["beta10","mean"]*x10 + mod.fit$BUGSoutput$summary["beta11","mean"]*x11 + mod.fit$BUGSoutput$summary["beta12","mean"]*x12 + mod.fit$BUGSoutput$summary["beta13","mean"]*x13
+x_logits <- mod.fit$BUGSoutput$summary["beta0","mean"] + mod.fit$BUGSoutput$summary["beta2","mean"]*x2 + mod.fit$BUGSoutput$summary["beta3","mean"]*x3 + mod.fit$BUGSoutput$summary["beta4","mean"]*x4 + mod.fit$BUGSoutput$summary["beta7","mean"]*x7 + mod.fit$BUGSoutput$summary["beta9","mean"]*x9 + mod.fit$BUGSoutput$summary["beta10","mean"]*x10 + mod.fit$BUGSoutput$summary["beta12","mean"]*x12 + mod.fit$BUGSoutput$summary["beta13","mean"]*x13
 
 x_probs <- 1/(1+exp(-x_logits))
 
-x1 <- as.vector(dat$age) # Age
-x2 <- as.vector(dat$sex) # Sex
-x3 <- as.vector(dat$cp) # Chest Pain Type: 1) Typical Angina 2) Atypical Angina 3) Non-Anginal Pain 4) Asymptomatic
-x4 <- as.vector(dat$trtbps) # resting blood pressure (in mm Hg)
-x5 <- as.vector(dat$chol) # cholestoral in mg/dl fetched via BMI sensor
-x6 <- as.vector(dat$fbs) # (fasting blood sugar > 120 mg/dl) (1 = true; 0 = false)
-x7 <- as.vector(dat$restecg) # resting electrocardiographic results 0) Normal 1) having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV) 2) showing probable or definite left ventricular hypertrophy by Estes' criteria 
-x8 <- as.vector(dat$thalachh) # maximum heart rate achieved
-x9 <- as.vector(dat$exng) # exercise induced angina (1 = yes; 0 = no)
-x10 <- as.vector(dat$oldpeak) # Previous peak
-x11 <- as.vector(dat$slp) # Slope
-x12 <- as.vector(dat$caa) # number of major vessels (0-3)
-x13 <- as.vector(dat$thall) # Thal rate
-
-df <- data.frame("x2" = sort(x2), "x3" = sort(x3), "x4" = sort(x4), "x8" = sort(x8),
-                 "x9" = sort(x9), "x10" = sort(x10), "x11" = sort(x11),
+df <- data.frame("x2" = sort(x2), "x3" = sort(x3), "x4" = sort(x4), "x7" = sort(x7),
+                 "x9" = sort(x9), "x10" = sort(x10),
                  "x12" = sort(x12), "x13" = sort(x13))
 
 # Plotting only significant visualizations
-
-# df %>%
-#   hchart('line', hcaes(x = df$x2, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
-#     hc_add_series(df, "scatter", hcaes(x = df$x2, y = sort(dat$output))) %>%
-#       hc_title(text = "The logistic regression, for the Sex") %>%
-#         hc_xAxis(title = list(text = "x2 obs")) %>%
-#           hc_yAxis(title = list(text = 'logit'))
-
-# df %>%
-#   hchart('line', hcaes(x = df$x3, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
-#     hc_add_series(df, "scatter", hcaes(x = df$x3, y = sort(dat$output))) %>%
-#       hc_title(text = "The logistic regression, for the type of chest pain") %>%
-#         hc_xAxis(title = list(text = "x3 obs")) %>%
-#           hc_yAxis(title = list(text = 'logit'))
 
 df %>%
   hchart('line', hcaes(x = df$x4, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
@@ -1428,47 +1510,19 @@ df %>%
         hc_xAxis(title = list(text = "x8 obs")) %>%
           hc_yAxis(title = list(text = 'logit'))
 
-# df %>%
-#   hchart('line', hcaes(x = df$x9, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
-#     hc_add_series(df, "scatter", hcaes(x = df$x9, y = sort(dat$output))) %>%
-#       hc_title(text = "The logistic regression, for exercise induced angina") %>%
-#         hc_xAxis(title = list(text = "x9 obs")) %>%
-#           hc_yAxis(title = list(text = 'logit'))
-
 df %>%
   hchart('line', hcaes(x = df$x10, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
     hc_add_series(df, "scatter", hcaes(x = df$x10, y = sort(dat$output))) %>%
       hc_title(text = "The logistic regression, for old peak") %>%
         hc_xAxis(title = list(text = "x10 obs")) %>%
           hc_yAxis(title = list(text = 'logit'))
-
-# df %>%
-#   hchart('line', hcaes(x = df$x11, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
-#     hc_add_series(df, "scatter", hcaes(x = df$x11, y = sort(dat$output))) %>%
-#       hc_title(text = "The logistic regression, for the slope") %>%
-#         hc_xAxis(title = list(text = "x11 obs")) %>%
-#           hc_yAxis(title = list(text = 'logit'))
-
-# df %>%
-#   hchart('line', hcaes(x = df$x12, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
-#     hc_add_series(df, "scatter", hcaes(x = df$x12, y = sort(dat$output))) %>%
-#       hc_title(text = "The logistic regression, for the number of major vessels") %>%
-#         hc_xAxis(title = list(text = "x12 obs")) %>%
-#           hc_yAxis(title = list(text = 'logit'))
-# 
-# df %>%
-#   hchart('line', hcaes(x = df$x13, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
-#     hc_add_series(df, "scatter", hcaes(x = df$x13, y = sort(dat$output))) %>%
-#       hc_title(text = "The logistic regression, for the number of thall") %>%
-#         hc_xAxis(title = list(text = "x13 obs")) %>%
-#           hc_yAxis(title = list(text = 'logit'))
 ```
 
 We prefer considering to show only the significant ones.
 
 $$~$$
 
-## <a id="simulatedata"> Simulation for parameters recovery </a>
+## <a id="simulatedata"> Parameters Recovery Simulations </a>
 
 $$~$$
 Now, we understood that the first model is better than the second. So, for checking that the model proposed can correctly recover the model parameters. I Executed the simulation considering the data simulated from the model proposed, the beta parameters checked are the estimated from the first model, considering these values we can continue with our last purpose:
@@ -1480,31 +1534,30 @@ Now, we understood that the first model is better than the second. So, for check
 N <- 302
 
 # Pick fixed values for the parameters of the model
-beta_2 <- mod.fit$BUGSoutput$summary["beta2","mean"] # rnorm(1, mean = -1, sd = 0.000001) 
-beta_3 <- mod.fit$BUGSoutput$summary["beta3","mean"] # rnorm(1, mean = 0.5, sd = 0.000001) 
-beta_4 <- mod.fit$BUGSoutput$summary["beta4","mean"] # rnorm(1, mean = 0, sd = 0.000001) 
-beta_8 <- mod.fit$BUGSoutput$summary["beta8","mean"] # rnorm(1, mean = 0, sd = 0.000001) 
-beta_9 <- mod.fit$BUGSoutput$summary["beta9","mean"] # rnorm(1, mean = -0.5, sd = 0.000001) 
-beta_10 <- mod.fit$BUGSoutput$summary["beta10","mean"] # rnorm(1, mean = 0.5, sd = 0.000001) 
-beta_11 <- mod.fit$BUGSoutput$summary["beta11","mean"] # rnorm(1, mean = 0.5, sd = 0.000001) 
-beta_12 <- mod.fit$BUGSoutput$summary["beta12","mean"] # rnorm(1, mean = -0.5, sd = 0.000001) 
-beta_13 <- mod.fit$BUGSoutput$summary["beta13","mean"] # rnorm(1, mean = -0.5, sd = 0.000001) 
+beta_0 <- mod.fit$BUGSoutput$summary["beta0","mean"]
+beta_2 <- mod.fit$BUGSoutput$summary["beta2","mean"]
+beta_3 <- mod.fit$BUGSoutput$summary["beta3","mean"] 
+beta_4 <- mod.fit$BUGSoutput$summary["beta4","mean"] 
+beta_7 <- mod.fit$BUGSoutput$summary["beta7","mean"]
+beta_9 <- mod.fit$BUGSoutput$summary["beta9","mean"]
+beta_10 <- mod.fit$BUGSoutput$summary["beta10","mean"]
+beta_12 <- mod.fit$BUGSoutput$summary["beta12","mean"] 
+beta_13 <- mod.fit$BUGSoutput$summary["beta13","mean"] 
 
 # Simulate the independent variables - TRY WITH THE SAME DATA X2, X3...
 set.seed(123)
-sim_dat <- data.frame("sim_x2" = rbinom(N, 0:1, prob = mean(x2)),
-                      "sim_x3" = rbinom(N, 0:3, prob = mean(x3)),
-                      "sim_x4" = round(rnorm(N, mean = mean(x4), sd = sd(x4))),
-                      "sim_x8" = round(rnorm(N, mean = mean(x8), sd = sd(x8))),
-                      "sim_x9" = rbinom(N, 0:1, prob = mean(x9)),
-                      "sim_x10" = round(rnorm(N, mean = mean(x10), sd = sd(x10)),1),
-                      "sim_x11" = rbinom(N, 0:2, prob = mean(x11)-1),
-                      "sim_x12" = rbinom(N, 0:3, prob = mean(x12)),
-                      "sim_x13" = rbinom(N, 0:3, prob = mean(x13)-2)
+sim_dat <- data.frame("sim_x2" = sample(x2, N, replace=T),
+                      "sim_x3" = sample(x3, N, replace=T),
+                      "sim_x4" = sample(x4, N, replace=T),
+                      "sim_x7" = sample(x7, N, replace=T),
+                      "sim_x9" = sample(x9, N, replace=T),
+                      "sim_x10" = sample(x10, N, replace=T),
+                      "sim_x12" = sample(x12, N, replace=T),
+                      "sim_x13" = sample(x13, N, replace=T)
           )
 
 # Simulate response according to the model
-linpred <- beta_2*sim_dat$sim_x2 + beta_3*sim_dat$sim_x3 + beta_4*sim_dat$sim_x4 + beta_8*sim_dat$sim_x8 + beta_9*sim_dat$sim_x9 + beta_10*sim_dat$sim_x10 + beta_11*sim_dat$sim_x11 + beta_12*sim_dat$sim_x12 + beta_13*sim_dat$sim_x13
+linpred <- beta_0 + beta_2*sim_dat$sim_x2 + beta_3*sim_dat$sim_x3 + beta_4*sim_dat$sim_x4 + beta_7*sim_dat$sim_x7 + beta_9*sim_dat$sim_x9 + beta_10*sim_dat$sim_x10 + beta_12*sim_dat$sim_x12 + beta_13*sim_dat$sim_x13
 
 pis <- 1/(1+exp(-linpred))
 
@@ -1519,10 +1572,9 @@ sim_dat$output <- r
 # Passing the data for RJags
 sim_data.jags <- list("y" = sim_dat$output, "N" = N,
                   "x2" = sim_dat$sim_x2, "x3" = sim_dat$sim_x3, 
-                  "x4" = sim_dat$sim_x4, "x8" = sim_dat$sim_x8, 
+                  "x4" = sim_dat$sim_x4, "x7" = sim_dat$sim_x7, 
                   "x9" = sim_dat$sim_x9, "x10" = sim_dat$sim_x10, 
-                  "x11" = sim_dat$sim_x11, "x12" = sim_dat$sim_x12, 
-                  "x13" = sim_dat$sim_x13)
+                  "x12" = sim_dat$sim_x12, "x13" = sim_dat$sim_x13)
 
 # Run JAGS
 n.chains <- 3
@@ -1530,7 +1582,7 @@ set.seed(123)
 mod.fit_sim <- jags(data = sim_data.jags,                                                 # DATA
                 model.file = model,                                                       # MODEL
                 parameters.to.save = mod.params,                                          # TRACKING
-                n.chains = n.chains, n.iter = 10000, n.burnin = 1000)  #n.thin = 10       # MCMC 
+                n.chains = n.chains, n.iter = 10000, n.burnin = 1000, n.thin = 10)        # MCMC 
 
 mod.fit_sim
 ```
@@ -1540,13 +1592,15 @@ The values are slighlty the same, so the parameters are recovered partially well
 ```{r echo=FALSE}
 comparison <- rbind(mod.fit$BUGSoutput$summary[, "mean"], mod.fit_sim$BUGSoutput$summary[, "mean"])
 rownames(comparison) <- c("Estimated", "True")
-comparison
+comparison <- as.data.frame(comparison)
+comparison$deviance <- NULL
+as.matrix(comparison)
 ```
 
 
 $$~$$
 
-## <a id="finalconclusions"> ... Final conclusions </a>
+## <a id="finalconclusions"> ... Final Conclusions </a>
 
 $$~$$
 
@@ -1558,7 +1612,20 @@ So thanks for all!
 
 $$~$$
 
-# <a id="#thereferences"> The References </a>
+# <a id="furtherwork"> Further Work </a>
+
+$$~$$
+
+Here I pointed different new improvements that could be done in a future time:
+
+1. Try to create different model, using different binary classificator like: SVM, K-Nearest Neighbours, Decision Tree etc..
+2. Oversampling the dataset to see other practical predictions
+3. More interesting plots to describe each subchapter
+4. Try to consider, after oversampling the dataset, a validation set to tune better the parameters
+5. Try to use other link function
+6. A Better feature engineering on the features dataset chosen
+
+# <a id="thereferences"> The References </a>
 
 $$~$$
 
@@ -1583,3 +1650,9 @@ $$~$$
 10. Typical Angina - [NCBI] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5680106
 
 11. RDocumentations - [RDocumention] https://www.rdocumentation.org
+
+12. Spectrum of ECG changes during exercise testing - [SomePoMed] https://somepomed.org/articulos/contents/mobipreview.htm?13/38/13930
+
+$$~$$
+
+$$~$$
