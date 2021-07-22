@@ -31,8 +31,8 @@ require(factoextra)
 require(highcharter)
 require(dplyr)
 
+# loading the categeories
 load_cat <- function(frame) {
-    
   sorted_df <- frame %>%
               drop_na() %>%
               dplyr::summarise(Count = n()) %>%
@@ -42,6 +42,7 @@ load_cat <- function(frame) {
     return(sorted_df)
 }
 
+# getting the histograms and the relative summaries, using meanwhile hchart for plotting the hists
 hist.and.summary <- function(variable, main.title){
   print(summary(dat[[variable]])) 
   hchart(dat[[variable]], type = "column", name = variable, color = randomcoloR::randomColor()) %>%
@@ -53,7 +54,6 @@ hist.and.summary <- function(variable, main.title){
 }
 
 dense.chart <- function(name, title){ # Showing the density considering the two cases of having an heart attack or not
-  
   frame <- dat[ , (names(dat) %in% c(name, 'output'))] # select the interested rows
 
   # sub select the two categories
@@ -66,6 +66,11 @@ dense.chart <- function(name, title){ # Showing the density considering the two 
           hc_xAxis(title = name)
 }
 ```
+
+```{r set_seed, echo=FALSE}
+set.seed(123)
+```
+
 
 $$~$$
 
@@ -104,8 +109,8 @@ $$~$$
         + <a href="#comparedallcriteria"> Comparing DIC, AIC, BIC </a>
 - <a href="#conclusions"> The Conclusions </a>
     + <a href="#simulatedata"> Parameters Recovery Simulations </a>
-    + <a href="#finalconclusions"> ...Final Conclusions </a>
     + <a href="#furtherwork"> Further Work </a>
+    + <a href="#finalconclusions"> ...Final Conclusions </a>
     + <a href="#thereferences"> The References </a>
 
 $$~$$
@@ -252,7 +257,7 @@ Here, we want to analyze the percentages of each categorical data:
 $$~$$
 
 ```{r echo=FALSE}
-get_cp_str <- function(bool_var){
+get_cp_str <- function(bool_var){ # get the type of chest pain
   char_list <- c(1, length(bool_var))
   for (i in 1:length(bool_var)) {
     var <- bool_var[i]
@@ -280,6 +285,7 @@ get_cp_str <- function(bool_var){
     return(char_list)
  }
 
+# extract for each type of chest pain the relative percentage
 cp_dat <- dat %>% 
     dplyr::select(cp) %>%
     dplyr::group_by(cp) %>%
@@ -290,6 +296,7 @@ cp_dat <- dat %>%
         percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
     )
 
+# plotting the cp_dat
 cp_dat %>%
   hchart(type = "pie", hcaes(x = paste(cp_str, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(title = 'Chest Pain', categories = paste(cp_dat$cp_str, ' (', cp_dat$percentage, ')' )) %>%
@@ -307,7 +314,7 @@ Women and elderly patients are usually have atypical symptoms both at rest and d
 $$~$$
  
 ```{r echo=FALSE}
-get_string <- function(bool_var){
+get_string <- function(bool_var){ # get the type of fbs
   char_list <- c(1, length(bool_var))
   for (i in 1:length(bool_var)) {
     var <- bool_var[i]
@@ -326,6 +333,7 @@ get_string <- function(bool_var){
     return(char_list)
  }
 
+# creating the dataframe for using it in the next lines of code
 fbs_dat <- dat %>% 
     dplyr::select(fbs) %>%
     dplyr::group_by(fbs) %>%
@@ -336,6 +344,7 @@ fbs_dat <- dat %>%
         percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
     )
 
+# plotting the dataframe obtained before
 fbs_dat %>%
   hchart(type = "pie", hcaes(x = paste(fbs_str, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(title = 'fasting blood sugar', categories = paste(get_string(fbs_dat$fbs_str), ' (', fbs_dat$percentage, ')' )) %>%
@@ -347,7 +356,7 @@ fbs_dat %>%
 ```
 
 ```{r echo=FALSE}
-get_restecg_str <- function(bool_var){
+get_restecg_str <- function(bool_var){ # get the restecg
   char_list <- c(1, length(bool_var))
   for (i in 1:length(bool_var)) {
     var <- bool_var[i]
@@ -369,6 +378,7 @@ get_restecg_str <- function(bool_var){
     return(char_list)
  }
 
+# creating the dataframe for using it in the next lines of code
 restecg_dat <- dat %>% 
     dplyr::select(restecg) %>%
     dplyr::group_by(restecg) %>%
@@ -379,6 +389,7 @@ restecg_dat <- dat %>%
         percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
     )
 
+# using the dataframe to plot it
 restecg_dat %>%
   hchart(type = "pie", hcaes(x = paste(restecg_str, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(title = 'restecg', categories = paste(restecg_dat$restecg_str, ' (', restecg_dat$percentage, ')' )) %>%
@@ -390,12 +401,14 @@ restecg_dat %>%
 ```
 
 ```{r echo=FALSE}
-slp_dat <- load_cat(
+# creating the dataframe for using it in the next lines of code
+slp_dat <- load_cat( 
               dat %>%
                dplyr::select(slp) %>%
                dplyr::group_by(slp)
              )
 
+# using the dataframe
 slp_dat %>%
   hchart(type = "pie", hcaes(x = paste(slp, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(title = 'Slope', categories = paste(slp_dat$slp, ' (', slp_dat$percentage, ')' )) %>%
@@ -416,12 +429,14 @@ The most relevant rate slope is approximately between the first and second type 
 $$~$$
 
 ```{r echo=FALSE}
+# creating the dataframe for using it in the next lines of code
 caa_dat <- load_cat(
               dat %>%
                dplyr::select(caa) %>%
                dplyr::group_by(caa)
              )
 
+# using the dataframe for plotting it
 caa_dat %>%
   hchart(type = "pie", hcaes(x = paste(caa, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(title = 'caa', categories = paste(caa_dat$caa, ' (', caa_dat$percentage, ')' )) %>%
@@ -438,13 +453,14 @@ The most case is 0 major vessels interested, this means that they aren't effect 
 $$~$$
 
 ```{r echo=FALSE}
-
+# creating the dataframe for using it in the next lines of code
 thall_dat <- load_cat(
               dat %>%
                dplyr::select(thall) %>%
                dplyr::group_by(thall)
              )
 
+# using the dataframe to plot it
 thall_dat %>%
   hchart(type = "pie", hcaes(x = paste(thall, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(title = 'Thall', categories = paste(thall_dat$thall, ' (', thall_dat$percentage, ')' )) %>%
@@ -461,7 +477,7 @@ the maximum rate achieved is about a fixed defect.
 $$~$$
 
 ```{r echo=FALSE}
-make_string <- function(bool_var){
+make_string <- function(bool_var){ # get the accepted exng or not
   char_list <- c(1, length(bool_var))
   for (i in 1:length(bool_var)) {
     var <- bool_var[i]
@@ -480,6 +496,7 @@ make_string <- function(bool_var){
     return(char_list)
  }
 
+# creating the dataframe for using it in the next lines of code
 exng_dat <- dat %>% 
     dplyr::select(exng) %>%
     dplyr::group_by(exng) %>%
@@ -489,6 +506,8 @@ exng_dat <- dat %>%
         exng_txt = make_string(exng),
         percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
     )
+
+# using the dataframe to plot it
 exng_dat %>%
   hchart(type = "pie", hcaes(x = paste(exng_txt, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(title = 'Exercise Induced Angina', categories = paste(exng_dat$exng_txt, ' (', exng_dat$percentage, ')' )) %>%
@@ -507,7 +526,7 @@ As the heart pumps harder to keep up with what you are doing, it needs more oxyg
 $$~$$
 
 ```{r echo=FALSE}
-
+# get the type of gender
 make_string = function(bool_var){
   char_list = c(1, length(bool_var))
   for (i in 1:length(bool_var)) {
@@ -527,6 +546,7 @@ make_string = function(bool_var){
     return(char_list)
  }
 
+# creating the dataframe for using it in the next lines of code
 gender_dat <- dat %>% 
     dplyr::select(sex) %>%
     dplyr::group_by(sex) %>%
@@ -537,7 +557,7 @@ gender_dat <- dat %>%
         percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
     )
 
-
+# using the dataframe to plot it
 gender_dat %>%
   hchart(type = "pie", hcaes(x = paste(gender, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(categories = paste(gender_dat$gender, ' (', gender_dat$percentage, ')' )) %>%
@@ -550,7 +570,7 @@ gender_dat %>%
 ``` 
 
 ```{r echo=FALSE}
-make_string_heart <- function(bool_var){
+make_string_heart <- function(bool_var){ # get if the person has a heart attack or not
   char_list <- c(1, length(bool_var))
   for (i in 1:length(bool_var)) {
     var <- bool_var[i]
@@ -570,6 +590,7 @@ make_string_heart <- function(bool_var){
     return(char_list)
  }
 
+# creating the dataframe for using it in the next lines of code
 output_dat <- dat %>% 
     dplyr::select(output) %>%
     dplyr::group_by(output) %>%
@@ -580,7 +601,7 @@ output_dat <- dat %>%
         percentage = paste0(round(Count / sum(Count) * 100, 1), "%")
     )
 
-
+# using the dataframe to plot it
 output_dat %>%
   hchart(type = "pie", hcaes(x = paste(heart_attack, ' \t(', percentage, ')' ), y = Count)) %>%
     hc_xAxis(categories = paste(output_dat$heart_attack, ' (', gender_dat$percentage, ')' )) %>%
@@ -695,7 +716,7 @@ $$~$$
 
 - ***Likelihood $\pi(y_{obs}|\theta)$:*** measures the goodness of fit of a statistical model to ***a sample of data for giving values of the unknown parameters***. It is formed from the joint probability distribution of the sample, but viewed and used as a function of the parameters only, thus treating the random variables as fixed at the observed values.
 
-- ***Logistic regression model:*** Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables. This is more faster than other binary classificators.
+- ***Logistic regression model:*** Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables. This is more faster than other binary classifiers.
 
 - ***logit link function:*** it uses the Cumulative Distribution Function (CDF) of the logistic distribution. A benefit to use the Logit is that the coefficients can be interpreted in the terms of odds ratios.
 
@@ -713,7 +734,15 @@ $$~$$
 
 The main goal is to leverage the main fully Bayesian analysis, based on understanding if a person has a heart attack or not. 
 
-So, the response variable $Y_i$ (that is the "output" feature in our dataset) is the heart attack $\in \{0,1\}$ and the predictor variables ($x_i \in \mathbb{R}^{+}$) have been chosen using the glm() function (we are cheating, but in this way we can sure that we are catching the right variables), used to fit generalized linear models, as we can see below:
+For testing the model in the prediction phase, we decide to split the dataset in train (80%) and test set (20%). In order to be able to see how much is better our model. I decided also to scale the values for having a well representation on the model with the scaled values to calculate easily them.
+
+So, the principal components of the first model are: 
+
+1. The response variable $Y_i$ (the "output" feature) that is the binary value that indicates if there is a heart attack or not, so it $\in \{0,1\}$
+
+2. The predictor variables ($x_i \in \mathbb{R}^{+}$) that are chosen using the glm() function (we are cheating, but in this way we know before which are the right variables and at the same time we tried the frequentist approach), used to fit generalized linear models
+
+As we can see below, if we consider all the variables within the Logistic Regression model, we see:
 
 $$~$$
 
@@ -744,32 +773,41 @@ x11 <- as.vector(scale(as.vector(dat$slp))) # Slope
 x12 <- as.vector(scale(as.vector(dat$caa))) # number of major vessels (0-3)
 x13 <- as.vector(scale(as.vector(dat$thall))) # Thal rate
 
-summary(glm(y ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11+x12+x13, family = binomial(link = "logit"),data=dat))
+summary(glm(y ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11+x12+x13, family = binomial(link = "logit"),data=dat)) # frequentistic approach
 ```
 
 $$~$$
 
-As we can see above, the glm rejects the hypothesis to consider the variables:
+As we can see above, the glm() function rejects the hypothesis to consider these variables:
 
 - ***Age ~ $x_1$***
 - ***Cholestoral ~ $x_5$***
-- ***fasting blood sugar ~ $x_6$***
-- ***resting electrocardiographic results ~ $x_7$***
+- ***Fasting Blood Sugar ~ $x_6$***
+- ***Resting Electrocardiographic Results ~ $x_7$***
+- ***thalachh ~ $x_{8}$***
+- ***exng ~ $x_{9}$***
 
-... and also the ***intercept*** isn't a good choice to admit it in our model.
+... the ***intercept*** in this case is a good choice to admit it in our model.
 
-An important remark to highlight is that we tried to do the frequentist approach of these data and we should remember that considering all of the features we achieved 238.35 as AIC value.
+An important remark to highlight is that we tried to do the frequentist approach of these data and we should remember that considering all of the features we achieved 204.6 as AIC value.
 
 But, if we try with the features that we decide to consider in the next steps?
 
-```{r echo="FALSE"}
-summary(glm(y ~ x2+x3+x4+x7+x9+x10+x12+x13, family = binomial(link = "logit"),data=dat))
-dat_test <- dat_test[, -c(1,5,6,8,11)]
+```{r}
+summary(glm(y ~ x2+x3+x4+x10+x11+x12+x13, family = binomial(link = "logit"),data=dat)) # frequentistic approach
 ```
 
-The behaviour is slightly changed, we have 234.19 as AIC value, we will see if we achieve the same result!
+```{r echo=FALSE}
+dat_test <- dat_test[, -c(1,5,6,7,8,9)] # removing the useless features
+```
 
-Then, in summary we have N = 302 observations and we considered these features after manually checks which are the best to consider, we adopted the technique of feature engineering. Then we decided to consider two models and see the difference on which model at the end is the best model of our analysis.
+The behaviour is slightly changed, we have 203.04 as AIC value, we will see if we achieve the same result!
+
+We considered these features, after manually checking which are the best to consider, we adopted the technique of feature engineering. 
+
+Then, we decided to consider another models and see the difference on which model at the end is the best model of our analysis.
+
+Then, in summary we have N = 302 observations in our dataset well distributed.
 
 $$~$$
 
@@ -777,16 +815,16 @@ $$~$$
 
 $$~$$
 
-In the first model, we decide to consider the following logistic regression model with the logit link function: 
+In the first model, we decide to consider the following Logistic Regression model with the logit as link function: 
 
 $$
 Y_i \sim Bern(logit(p_i)) \\
-logit(p_i) =  log\Big(\frac{p_i}{1-p_i}\Big)= \beta_{2} \cdot x_{2_i} + \beta_{3} \cdot x_{3_i} + \beta_{4} \cdot x_{4_i} +\beta_{8} \cdot x_{8_i} + \beta_{9} \cdot x_{9_i} + \beta_{10} \cdot x_{10_i} + \beta_{11} \cdot x_{11_i} + \beta_{12} \cdot x_{12_i} + \beta_{13} \cdot x_{13_i}
+logit(p_i) =  log\Big(\frac{p_i}{1-p_i}\Big)= \beta_{0} + \beta_{2} \cdot x_{2_i} + \beta_{3} \cdot x_{3_i} + \beta_{4} \cdot x_{4_i}+ \beta_{10} \cdot x_{10_i} + \beta_{11} \cdot x_{11_i} + \beta_{12} \cdot x_{12_i} + \beta_{13} \cdot x_{13_i}
 $$
-The prior beta parameters are chosen approximatly considering the estimated averages saw in the previous subsection regarding the outcomes of glm(). So, the beta prior parameters are distributed following a normal distribution as follows:
+The prior beta parameters are chosen considering the $\mu = 0$ and $\tau^2 = 0.000001$. So, the beta prior parameters are distributed following a normal distribution as follows:
 
 $$
-\beta_i \sim N(\mu = 0, \tau^2 = 0.000001)  \,\,\, for \,\, i \,\, = 2,3,4,8,9,..,13
+\beta_i \sim N(\mu = 0, \tau^2 = 0.000001)  \,\,\, for \,\, i \,\, = 0, 2,3,4,10,11,12,13
 $$
 
 The main reason is that we prefer chosing the binary classification as in this case the logistic regression to model our outcomes based only on 0 or 1.
@@ -810,7 +848,7 @@ model <- function(){
   # Likelihood
   for (i in 1:N){
     y[i] ~ dbern(p[i])
-    logit(p[i]) <-  beta0 + beta2*x2[i] + beta3*x3[i] + beta4*x4[i] + beta7*x7[i] + beta9*x9[i] + beta10*x10[i] + beta12*x12[i] + beta13*x13[i] # omit intercept and not useful variables
+    logit(p[i]) <-  beta0 + beta2*x2[i] + beta3*x3[i] + beta4*x4[i] + beta10*x10[i] + beta11*x11[i] + beta12*x12[i] + beta13*x13[i] # omit intercept and not useful variables
   }
   
   # Defining the prior beta parameters
@@ -818,9 +856,8 @@ model <- function(){
   beta2 ~ dnorm(0, 1.0E-6)
   beta3 ~ dnorm(0, 1.0E-6)
   beta4 ~ dnorm(0, 1.0E-6)
-  beta7 ~ dnorm(0, 1.0E-6)
-  beta9 ~ dnorm(0, 1.0E-6)
   beta10 ~ dnorm(0, 1.0E-6)
+  beta11 ~ dnorm(0, 1.0E-6)
   beta12 ~ dnorm(0, 1.0E-6)
   beta13 ~ dnorm(0, 1.0E-6)
 }
@@ -835,10 +872,10 @@ $$~$$
 ```{r}
 # Passing the data for RJags
 data.jags <- list("y" = y, "N" = N,
-                  "x2" = x2, "x3" = x3, "x4" = x4, "x7" = x7, "x9" = x9, "x10" = x10, "x12" = x12, "x13" = x13)
+                  "x2" = x2, "x3" = x3, "x4" = x4, "x10" = x10, "x11" = x11, "x12" = x12, "x13" = x13)
 
 # Defining parameters of interest to show after running RJags
-mod.params <- c("beta0", "beta2", "beta3", "beta4", "beta7", "beta9", "beta10", "beta12", "beta13")
+mod.params <- c("beta0", "beta2", "beta3", "beta4", "beta10", "beta11", "beta12", "beta13")
 ```
 
 $$~$$
@@ -896,8 +933,8 @@ chainArray <- mod.fit$BUGSoutput$sims.array
 
 # considering to split each couples of parameters
 bayesplot::mcmc_combo(chainArray, pars = c("deviance", "beta2", "beta3"))
-bayesplot::mcmc_combo(chainArray, pars = c("beta4", "beta7", "beta9"))
-bayesplot::mcmc_combo(chainArray, pars = c("beta10", "beta12", "beta13"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta4", "beta10", "beta11"))
+bayesplot::mcmc_combo(chainArray, pars = c("beta12", "beta13"))
 ```
 
 $$~$$
@@ -959,7 +996,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 7])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 8]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 9]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta12") %>%
+        hc_title(text = "The Empirical Mean of beta11") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -967,7 +1004,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 10])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 11]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 12]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta13") %>%
+        hc_title(text = "The Empirical Mean of beta12") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -975,7 +1012,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 13])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 14]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 15]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta2") %>%
+        hc_title(text = "The Empirical Mean of beta13") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -983,7 +1020,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 16])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 17]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 18]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta3") %>%
+        hc_title(text = "The Empirical Mean of beta2") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -991,7 +1028,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 19])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 20]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 21]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta4") %>%
+        hc_title(text = "The Empirical Mean of beta3") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -999,7 +1036,7 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 22])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 23]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 24]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta7") %>%
+        hc_title(text = "The Empirical Mean of beta4") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 
@@ -1007,20 +1044,12 @@ df %>%
   hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 25])), color = "red", name = "First Chain") %>%
     hc_add_series( cummean(df[, 26]), type = "line", color = "blue", name = "Second Chain") %>%
       hc_add_series( cummean(df[, 27]), type = "line", color = "green", name = "Thrid Chain") %>%
-        hc_title(text = "The Empirical Mean of beta9") %>%
-          hc_xAxis(title = list(text = "Iteration")) %>%
-            hc_yAxis(title = list(text = 'Cumulative Mean'))
-
-df %>%
-  hchart('line', hcaes(x = 1:nrow(df), y = cummean(df[, 28])), color = "red", name = "First Chain") %>%
-    hc_add_series( cummean(df[, 29]), type = "line", color = "blue", name = "Second Chain") %>%
-      hc_add_series( cummean(df[, 30]), type = "line", color = "green", name = "Thrid Chain") %>%
         hc_title(text = "The Empirical Mean of deviance") %>%
           hc_xAxis(title = list(text = "Iteration")) %>%
             hc_yAxis(title = list(text = 'Cumulative Mean'))
 ```
 
-As we can see above each parameter achieves in all of the three chains generated the same end point, so means that with different initial points in these three chains, we are strictly going to have the same estimated mean parameter at the end.
+As we can see above each parameter achieves in all of the three chains generated the same end point, so means that with different initial points in these three chains, we are strictly going to have the same estimated mean parameter.
 
 $$~$$
 
@@ -1072,7 +1101,7 @@ mcse_dataframe
 
 $$~$$
 
-As we can see the $\beta_2$ has the highest uncertainty considering the jointly chains.
+As we can see the $\beta_2$ has the highest approximation error considering the jointly chains.
 
 $$~$$
 
@@ -1112,7 +1141,7 @@ hchart(round(cor(mod.fit$BUGSoutput$sims.matrix), digits = 2)) %>%
   hc_title(text = "Correlations between all the parameters calculated") # considering only the whole data
 ```
 
-the highest correlation is between $\beta_4 \text{ and } \beta_8$.
+the highest correlation is between $\beta_2 \text{ and } \beta_0$.
 
 $$~$$
 
@@ -1120,7 +1149,7 @@ $$~$$
 
 $$~$$
 
-Here, we want to understand if we achieve with these multiple simulations of the markov chains the convergences and the validity of the stationarity regions. We are considering different tools saw in the last lectures, to understand if we achieve or not the convergency, the tools utilized are:
+Here, we want to understand if we achieve with these multiple simulations of the markov chains the convergences and the validity of the stationarity regions. We are considering different tools, such as:
 
 - The Raftery & Lewis Diagnostic
 - The Geweke Diagnostic 
@@ -1132,7 +1161,7 @@ $$~$$
 ## <a id="raftery"> Raftery & Lewis Test </a>
 
 $$~$$
-This Introduces an MCMC diagnostic that estimates the number of iterations needed for a given level of precision in posterior samples, as well as estimating burn-in, when quantiles are the posterior summaries of interest.
+This Introduces a MCMC diagnostic that estimates the number of iterations needed for a given level of precision in posterior samples.
 
 ```{r}
 coda::raftery.diag(coda.fit)
@@ -1197,9 +1226,9 @@ coda::heidel.diag(coda.fit)
 
 $$~$$
 
-We prefer considering more the Heidel test because it is a double check of the stationarity and the convergency states. This is sometimes failed, meanwhile the other tools seems to be good, so I prefer considering this test.
+We prefer considering more the Heidel test because it is a double check of the stationarity and the convergency states. This sometimes failed, meanwhile the other tools seems to be good, so I prefer considering more this test than the others just seen.
 
-Here, we can see all is considered correctly, so our intuitions are correct!
+Here, we just have seen that all the tests of convergency and stationarity are passed, so our intuitions are correct!
 
 $$~$$
 
@@ -1207,7 +1236,9 @@ $$~$$
 
 $$~$$
 
-After checking that the simulations returned to pass the convergence, we can decide to pool up all the chains and does the credible interval and the point estimates for our beta values estimated:
+After checking that the simulations pass the convergence, we decide to pool together all the chains and create the credible intervals and the point estimates for our beta values estimated.
+
+These values will be useful also in the next sub chapters, these values are:
 
 ```{r}
 chainMat <- mod.fit$BUGSoutput$sims.matrix
@@ -1226,7 +1257,7 @@ cred <- 0.95
 
 $$~$$
 
-It's relevant to conclude that all your parameters (and its variables) are significant to predict heart attacks (except for $\beta_4$)
+It's relevant to conclude that all your parameters (and its variables) are significant to predict heart attacks (except $\beta_13$ that have the higher posterior uncertainty than the others parameters)
 
 $$~$$
 
@@ -1237,25 +1268,26 @@ $$~$$
 Here, we want to illustrate how using the markov chain to approximate the posterior predictive distribution of the people that could have the heart attack or not considering the features explained above. So, we want to approximate this area:
 
 $$
-m(y_{new}) = \int_{\Theta} f(y_{new}|\theta, Y_{old}, x_2, x_3, x_4, x_8, x_9, x_{10}, x_{11}, x_{12}, x_{13})\pi(\theta)d\theta
+m(y_{new}) = \int_{\Theta} f(y_{new}|\theta, Y_{old}, x_2, x_3, x_4, x_{10}, x_{11}, x_{12}, x_{13})\pi(\theta)d\theta
 $$
 
-where the $\theta$ is equal to the coefficients used and considered before, $\Theta$ is the parameter space and $\pi(\theta)$ is the product of the priors thanks to marginal independence assumption. At the end, we want to smaple from the $\pi(\theta)$ and from $f(y_{new}|\theta, Y_{old}, x_2, x_3, x_4, x_8, x_9, x_{10}, x_{11}, x_{12}, x_{13})$. 
+where the $\theta$ is equal to the coefficients used and considered before, $\Theta$ is the parameter space and $\pi(\theta)$ is the product of the priors thanks to marginal independence assumption. 
 
-Here, there is a brief practical example where we predict 302 new random observations:
+At the end, we want to smaple from the $\pi(\theta)$ and from $f(y_{new}|\theta, Y_{old}, x_2, x_3, x_4, x_{10}, x_{11}, x_{12}, x_{13})$. 
+
+Here, there is a brief practical example where we predict the observations that are in the test set:
 
 ```{r}
 # creating false N observations, trying to predict them (creating a false test set)
-dat_test[c(2,3,4,6,7,8)] <- lapply(dat_test[c(2,3,4,6,7,8)], function(x) c(scale(x))) # scaling for predicting better than before
+dat_test[c(2,3,4,5,6,7)] <- lapply(dat_test[c(2,3,4,5,6,7)], function(x) c(scale(x))) # scaling for predicting better than before
 
 # Saving the estimated beta parameters
 beta_est <- list("beta0" = mod.fit$BUGSoutput$summary["beta0", "mean"],
                  "beta2" = mod.fit$BUGSoutput$summary["beta2", "mean"],
                  "beta3" = mod.fit$BUGSoutput$summary["beta3", "mean"],
                  "beta4" = mod.fit$BUGSoutput$summary["beta4", "mean"],
-                 "beta7" = mod.fit$BUGSoutput$summary["beta7", "mean"],
-                 "beta9" = mod.fit$BUGSoutput$summary["beta9", "mean"],
                  "beta10" = mod.fit$BUGSoutput$summary["beta10", "mean"],
+                 "beta11" = mod.fit$BUGSoutput$summary["beta11", "mean"],
                  "beta12" = mod.fit$BUGSoutput$summary["beta12", "mean"],
                  "beta13" = mod.fit$BUGSoutput$summary["beta13", "mean"])
 
@@ -1263,7 +1295,7 @@ beta_est <- list("beta0" = mod.fit$BUGSoutput$summary["beta0", "mean"],
 # Iterating and found each predictive values
 dat_test$output_predictive <- apply(dat_test, 1, function(x){
   
-  o <- beta_est$beta0 + beta_est$beta2*x["sex"] + beta_est$beta3*x["cp"] + beta_est$beta4*x["trtbps"] + beta_est$beta7*x["restecg"] + beta_est$beta9*x["exng"] + beta_est$beta10*x["oldpeak"] + beta_est$beta12*x["caa"] + beta_est$beta13*x["thall"]
+  o <- beta_est$beta0 + beta_est$beta2*x["sex"] + beta_est$beta3*x["cp"] + beta_est$beta4*x["trtbps"] + beta_est$beta10*x["oldpeak"] + beta_est$beta11*x["slp"] + beta_est$beta12*x["caa"] + beta_est$beta13*x["thall"]
   
   o_perc <- 1/(1+exp(-o))
   
@@ -1296,7 +1328,7 @@ info_dt <- data.frame("Accuracy" = mean(dat_test$output == dat_test$output_predi
 
 highchart() %>% 
   hc_chart(type = "column") %>%
-  hc_title(text = "The Classificator") %>%
+  hc_title(text = "The Classifier") %>%
   hc_plotOptions(column = list(stacking = "normal")) %>%
   hc_add_series(name="Accuracy of the Model",
                 data = info_dt$Accuracy,
@@ -1309,22 +1341,22 @@ highchart() %>%
   hc_plotOptions(column=list(depth= 100))
 ```
 
-With this fake predictions we are be able to see something in terms of accuracy of the model, as we can see above!
+As we can see above, we get a great performance on predicting these values in the test set!
 
-After read, the whole project report we will see which is the best model here in terms of predictions... stay tuned! 
+Now, let's move to introduce a new model, in order to see if it's better to change our actual model or not!
 
 $$~$$
 
 # <a id="tsm"> The Second Model </a>
 
 $$~$$
-Now, we want to focus to another model always the logistic regression with the whole features and a new link function, the ***cloglog function***.
+Now, we want to compare the first model with another model, we consider the logistic regression but inserting a polynomial function $cloglog(p_i) = \beta_{4_i} \cdot x_{4_i}^2 + (\beta_{5_i} \cdot \beta_{6_i}) \cdot (x_{5_i} + x_{6_i}) + \beta_{7_i} \cdot x_{7_i} + \beta_{8_i} \cdot x_{8_i} + \beta_{{13}_i} \cdot x_{{13}_i}$ in order to have the probability inserting randomly features and putting a new link function in this case the ***cloglog function***.
 
-Why this changment? Because, we want to see which model is better... and how can you see this? I'll tell you where you can easy see this better preference. 
+Why this changement? Because, we want to see which model is better... and how can you see this? I'll tell you which is the way to see which model is better for our data. 
 
 What is the link function? So, the link function transforms the probabilities of the levels of a categorical response variable to a continuous scale that is unbounded. Once the transformation is complete, the relationship between the predictors and the response can be modeled with the logistic regression for example.
 
-As we can see we will reproduce this second model changing the link function to see if it is better or not than the previous model:
+As we can see, we will reproduce this second model changing the link function to see if it is better or not than the previous model:
 
 $$~$$
 
@@ -1334,7 +1366,7 @@ model2 <- function(){
   # Likelihood
   for (i in 1:N){
     y[i] ~ dbern(p[i])
-    cloglog(p[i]) <-  beta4*x4[i]^2 + beta5*x5[i] + beta6*x6[i] + beta7*x7[i] + beta8*x8[i] + beta13*x13[i] # omit intercept and not useful variables
+    cloglog(p[i]) <-  beta4*x4[i]^2 + (beta5*beta6)*(x5[i]+x6[i]) + beta7*x7[i] + beta8*x8[i] + beta13*x13[i] # omit intercept and not useful variables
   }
   
   # Defining the priors
@@ -1375,7 +1407,7 @@ $$~$$
 
 $$~$$
 
-As we can see above, we tried to make a different model only changing the link function to see if it is better to associate with our data, the DIC (Deviance information criterion) is our indicator that says to us which is the better model.
+As we can see above, we consider a different model changing the link function and considering a polynomial function model, the DIC (Deviance information criterion) is our indicator that indicates the better model.
 
 The deviance information criterion (DIC) is a hierarchical modeling generalization of the Akaike information criterion (AIC). It is particularly useful in Bayesian model selection problems where the posterior distributions of the models have been obtained by Markov chain Monte Carlo (MCMC) simulation. DIC is an asymptotic approximation as the sample size becomes large, like AIC.
 
@@ -1448,8 +1480,11 @@ BIC(m) = D(\hat{\theta_m}, m) + log(n) \cdot d_m
 $$
 
 Where:
+
 - n is the number of observations considered 
+
 - $d_m$ is the number of coefficients considered. 
+
 - $D(\hat{\theta_m}, m)$ is the deviance of the model
 
 In our case comparing the two models we have these values of AIC:
@@ -1486,28 +1521,20 @@ $$~$$
 We try to plot the logistic regression using the parameters obtained in the first model, we compare the line for each parameter-response variable:
 
 ```{r echo=FALSE}
-x_logits <- mod.fit$BUGSoutput$summary["beta0","mean"] + mod.fit$BUGSoutput$summary["beta2","mean"]*x2 + mod.fit$BUGSoutput$summary["beta3","mean"]*x3 + mod.fit$BUGSoutput$summary["beta4","mean"]*x4 + mod.fit$BUGSoutput$summary["beta7","mean"]*x7 + mod.fit$BUGSoutput$summary["beta9","mean"]*x9 + mod.fit$BUGSoutput$summary["beta10","mean"]*x10 + mod.fit$BUGSoutput$summary["beta12","mean"]*x12 + mod.fit$BUGSoutput$summary["beta13","mean"]*x13
+x_logits <- mod.fit$BUGSoutput$summary["beta0","mean"] + mod.fit$BUGSoutput$summary["beta2","mean"]*x2 + mod.fit$BUGSoutput$summary["beta3","mean"]*x3 + mod.fit$BUGSoutput$summary["beta4","mean"]*x4 + mod.fit$BUGSoutput$summary["beta10","mean"]*x10 + mod.fit$BUGSoutput$summary["beta11","mean"]*x11 + mod.fit$BUGSoutput$summary["beta12","mean"]*x12 + mod.fit$BUGSoutput$summary["beta13","mean"]*x13 # get the value to get later the probability, part 1
 
-x_probs <- 1/(1+exp(-x_logits))
+x_probs <- 1/(1+exp(-x_logits)) # extract the real prob, part 2
 
-df <- data.frame("x2" = sort(x2), "x3" = sort(x3), "x4" = sort(x4), "x7" = sort(x7),
-                 "x9" = sort(x9), "x10" = sort(x10),
+df <- data.frame("x2" = sort(x2), "x3" = sort(x3), "x4" = sort(x4),
+                 "x10" = sort(x10), "x11" = sort(x11),
                  "x12" = sort(x12), "x13" = sort(x13))
 
 # Plotting only significant visualizations
-
 df %>%
   hchart('line', hcaes(x = df$x4, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
     hc_add_series(df, "scatter", hcaes(x = df$x4, y = sort(dat$output))) %>%
-      hc_title(text = "The logistic regression, for resting blood pressure") %>%
+      hc_title(text = "The logistic regression, for resting blood pressure achieved") %>%
         hc_xAxis(title = list(text = "x4 obs")) %>%
-          hc_yAxis(title = list(text = 'logit'))
-
-df %>%
-  hchart('line', hcaes(x = df$x8, y = sort(x_probs)), color = randomcoloR::randomColor()) %>%
-    hc_add_series(df, "scatter", hcaes(x = df$x8, y = sort(dat$output))) %>%
-      hc_title(text = "The logistic regression, for maximum heart rate achieved") %>%
-        hc_xAxis(title = list(text = "x8 obs")) %>%
           hc_yAxis(title = list(text = 'logit'))
 
 df %>%
@@ -1518,7 +1545,7 @@ df %>%
           hc_yAxis(title = list(text = 'logit'))
 ```
 
-We prefer considering to show only the significant ones.
+We prefer considering to show only the significant ones, in terms of visualization.
 
 $$~$$
 
@@ -1537,27 +1564,25 @@ N <- 302
 beta_0 <- mod.fit$BUGSoutput$summary["beta0","mean"]
 beta_2 <- mod.fit$BUGSoutput$summary["beta2","mean"]
 beta_3 <- mod.fit$BUGSoutput$summary["beta3","mean"] 
-beta_4 <- mod.fit$BUGSoutput$summary["beta4","mean"] 
-beta_7 <- mod.fit$BUGSoutput$summary["beta7","mean"]
-beta_9 <- mod.fit$BUGSoutput$summary["beta9","mean"]
+beta_4 <- mod.fit$BUGSoutput$summary["beta4","mean"]
 beta_10 <- mod.fit$BUGSoutput$summary["beta10","mean"]
+beta_11 <- mod.fit$BUGSoutput$summary["beta11","mean"]
 beta_12 <- mod.fit$BUGSoutput$summary["beta12","mean"] 
 beta_13 <- mod.fit$BUGSoutput$summary["beta13","mean"] 
 
-# Simulate the independent variables - TRY WITH THE SAME DATA X2, X3...
+# Simulate the independent variables, the sampling is like the ecdf(x) on the variables
 set.seed(123)
 sim_dat <- data.frame("sim_x2" = sample(x2, N, replace=T),
                       "sim_x3" = sample(x3, N, replace=T),
                       "sim_x4" = sample(x4, N, replace=T),
-                      "sim_x7" = sample(x7, N, replace=T),
-                      "sim_x9" = sample(x9, N, replace=T),
                       "sim_x10" = sample(x10, N, replace=T),
+                      "sim_x11" = sample(x11, N, replace=T),
                       "sim_x12" = sample(x12, N, replace=T),
                       "sim_x13" = sample(x13, N, replace=T)
           )
 
 # Simulate response according to the model
-linpred <- beta_0 + beta_2*sim_dat$sim_x2 + beta_3*sim_dat$sim_x3 + beta_4*sim_dat$sim_x4 + beta_7*sim_dat$sim_x7 + beta_9*sim_dat$sim_x9 + beta_10*sim_dat$sim_x10 + beta_12*sim_dat$sim_x12 + beta_13*sim_dat$sim_x13
+linpred <- beta_0 + beta_2*sim_dat$sim_x2 + beta_3*sim_dat$sim_x3 + beta_4*sim_dat$sim_x4 + beta_10*sim_dat$sim_x10 + beta_11*sim_dat$sim_x11 + beta_12*sim_dat$sim_x12 + beta_13*sim_dat$sim_x13
 
 pis <- 1/(1+exp(-linpred))
 
@@ -1565,15 +1590,14 @@ r <- sapply(pis, function(x){
   rbinom(1,1,x)
 })
 
-sim_dat$output <- r
+sim_dat$output <- r # attaching the output predictive values
 
 # Considering the first model, we change the parameters passed..
 
 # Passing the data for RJags
 sim_data.jags <- list("y" = sim_dat$output, "N" = N,
                   "x2" = sim_dat$sim_x2, "x3" = sim_dat$sim_x3, 
-                  "x4" = sim_dat$sim_x4, "x7" = sim_dat$sim_x7, 
-                  "x9" = sim_dat$sim_x9, "x10" = sim_dat$sim_x10, 
+                  "x4" = sim_dat$sim_x4, "x10" = sim_dat$sim_x10, "x11" = sim_dat$sim_x11, 
                   "x12" = sim_dat$sim_x12, "x13" = sim_dat$sim_x13)
 
 # Run JAGS
@@ -1587,16 +1611,48 @@ mod.fit_sim <- jags(data = sim_data.jags,                                       
 mod.fit_sim
 ```
 
-The values are slighlty the same, so the parameters are recovered partially well, as we can see above:
+$$~$$
+
+The values are slighlty the same, so the parameters are recovered partially well, as we can see below:
 
 ```{r echo=FALSE}
-comparison <- rbind(mod.fit$BUGSoutput$summary[, "mean"], mod.fit_sim$BUGSoutput$summary[, "mean"])
-rownames(comparison) <- c("Estimated", "True")
+comparison <- rbind(round(mod.fit$BUGSoutput$summary[, "mean"], digits = 3),
+                    round(mod.fit_sim$BUGSoutput$summary[, "mean"], digits = 3), 
+                    round(p.ET.jags, digits = 3))
+rownames(comparison) <- c("Estimated", "True", "2.5%", "97.5%")
+
 comparison <- as.data.frame(comparison)
 comparison$deviance <- NULL
-as.matrix(comparison)
+
+comparison <- rbind(comparison, rep(NA, ncol(comparison))); rownames(comparison)[5] <- "Recovered"
+
+for(col in 1:ncol(comparison)){ # get if we recovered the parameter or not
+  if( ((comparison["True", col] > comparison["2.5%", col]) & (comparison["True", col] < comparison["97.5%", col])) ){
+    comparison["Recovered", col] = "YES" 
+  } else {
+    comparison["Recovered", col] = "NO"
+  }
+}
+  
+comparison
 ```
 
+
+$$~$$
+
+# <a id="furtherwork"> Further Work </a>
+
+$$~$$
+
+Here, I pointed different new improvements that could be done in a future time:
+
+1. Create different models using different binary classifiers like: SVM, K-Nearest Neighbours, Decision Tree etc..
+2. Oversampling the dataset to see other practical predictions
+3. More interesting plots to describe the data
+4. consider, after oversampling the dataset, a validation set to tune better the parameters
+5. use other link functions
+6. A better feature engineering on the features dataset chosen
+7. Add other metrics in the predictions part like: F1 Score, Recall, Precision etc..
 
 $$~$$
 
@@ -1606,24 +1662,11 @@ $$~$$
 
 We saw the power and the weakness of Bayesian Analysis. 
 
-At first step we tried to face with the model on jags "cheating" a little bit on which independent variables are maybe good for our purposes and after that we make our usual considerations, then we compared with another model not so much good.. of course many little things could be improved in the future in this amazing analysis that I did in my opinion.
+At first step we tried to face with the model on jags, "cheating" a little bit on which independent variables are maybe good for our purposes and after making our usual considerations, we compared with another model not so much good.. of course many little things could be improved in the future in this amazing analysis.
 
 So thanks for all!
 
 $$~$$
-
-# <a id="furtherwork"> Further Work </a>
-
-$$~$$
-
-Here I pointed different new improvements that could be done in a future time:
-
-1. Try to create different model, using different binary classificator like: SVM, K-Nearest Neighbours, Decision Tree etc..
-2. Oversampling the dataset to see other practical predictions
-3. More interesting plots to describe each subchapter
-4. Try to consider, after oversampling the dataset, a validation set to tune better the parameters
-5. Try to use other link function
-6. A Better feature engineering on the features dataset chosen
 
 # <a id="thereferences"> The References </a>
 
